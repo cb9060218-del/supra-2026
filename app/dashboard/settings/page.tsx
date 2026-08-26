@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import RestoreCenter from "@/components/dashboard/RestoreCenter";
 import { User, ShieldAlert, ArchiveRestore, Database } from "lucide-react";
@@ -108,6 +109,32 @@ export default async function SettingsPage() {
           </ul>
         </div>
       </div>
+
+      {/* Super Admin Panel Shortcuts (Super Admin only, helpful for Mobile) */}
+      {profile && profile.role === "super_admin" && (
+        <div className="rounded-xl border border-zinc-900 bg-zinc-900/10 p-6 space-y-4 md:hidden">
+          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
+            <ShieldAlert className="h-4.5 w-4.5 text-zinc-500" /> Super Admin Mobile Controls
+          </h3>
+          <p className="text-xs text-zinc-400">
+            Quick links to access system configurations and audits from mobile devices:
+          </p>
+          <div className="grid grid-cols-2 gap-3 pt-1">
+            <Link
+              href="/dashboard/users"
+              className="flex items-center justify-center gap-1.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 py-3 text-xs font-semibold text-zinc-200"
+            >
+              User Approvals
+            </Link>
+            <Link
+              href="/dashboard/logs"
+              className="flex items-center justify-center gap-1.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 py-3 text-xs font-semibold text-zinc-200"
+            >
+              Audit Center
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Restore center Visualizer (Admins/Super Admins only) */}
       {isWritable ? (
