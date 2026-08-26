@@ -1,0 +1,22 @@
+{
+  "name": "SUPRA SAEINDIA 2026",
+  "short_name": "SUPRA 2026",
+  "description": "Sponsor, Guest, Benefits, and Gatepass Management Platform for SUPRA SAEINDIA Student Formula 2026",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "https://img.icons8.com/color/192/000000/formula-one--v1.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://img.icons8.com/color/512/000000/formula-one--v1.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
