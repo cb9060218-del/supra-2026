@@ -47,7 +47,6 @@ export default function Sidebar({ user }: SidebarProps) {
   const commonNavigation = [
     { name: "Overview", href: "/dashboard", icon: LayoutDashboard, roles: ["super_admin", "admin", "coordinator", "viewer"] },
     { name: "Sponsors CRM", href: "/dashboard/sponsors", icon: Award, roles: ["super_admin", "admin", "coordinator", "viewer"] },
-    { name: "Guests CRM", href: "/dashboard/guests", icon: Users, roles: ["super_admin", "admin", "coordinator", "viewer"] },
     { name: "Settings", href: "/dashboard/settings", icon: Settings, roles: ["super_admin", "admin", "coordinator", "viewer"] },
   ];
 
