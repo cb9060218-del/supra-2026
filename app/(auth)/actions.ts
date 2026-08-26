@@ -46,6 +46,11 @@ export async function loginAction(prevState: any, formData: FormData) {
         return { error: retryError.message };
       }
     } else {
+      if (signUpError.message.includes("rate limit") || signUpError.message.toLowerCase().includes("email")) {
+        return {
+          error: "Email rate limit exceeded. To resolve: Go to your Supabase Dashboard -> Authentication -> Providers -> Email and disable the 'Confirm email' toggle."
+        };
+      }
       return { error: error.message };
     }
   }
@@ -88,6 +93,11 @@ export async function registerAction(prevState: any, formData: FormData) {
   });
 
   if (error) {
+    if (error.message.includes("rate limit") || error.message.toLowerCase().includes("email")) {
+      return {
+        error: "Supabase Email Rate Limit Exceeded. To fix this: Go to your Supabase Dashboard -> Authentication -> Providers -> Email and disable the 'Confirm email' toggle. Alternatively, use the Super Admin / Admin toggles on the Login page."
+      };
+    }
     return { error: error.message };
   }
 
