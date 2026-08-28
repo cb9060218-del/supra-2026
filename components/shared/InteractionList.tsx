@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useTransition, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { MessageSquare, Phone, Users, Mail, Plus } from "lucide-react";
 import { formatDateTime } from "@/lib/utils";
 import { addSponsorInteractionAction } from "@/app/dashboard/sponsors/actions";
@@ -23,7 +24,12 @@ interface InteractionListProps {
 }
 
 export default function InteractionList({ sponsorId, interactions, isWritable }: InteractionListProps) {
+  const router = useRouter();
   const [list, setList] = useState<Interaction[]>(interactions);
+
+  useEffect(() => {
+    setList(interactions);
+  }, [interactions]);
   const [isAdding, setIsAdding] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -66,7 +72,7 @@ export default function InteractionList({ sponsorId, interactions, isWritable }:
         setIsAdding(false);
         setSummary("");
         setDetails("");
-        window.location.reload(); // Hard refresh to fetch proper user names
+        router.refresh();
       }
     });
   };

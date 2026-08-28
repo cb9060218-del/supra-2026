@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useTransition, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   ChevronRight,
   ChevronDown,
@@ -73,9 +74,22 @@ export default function SponsorList({
   initialBenefits,
   userRole,
 }: SponsorListProps) {
+  const router = useRouter();
   const [sponsors, setSponsors] = useState<Sponsor[]>(initialSponsors);
   const [guests, setGuests] = useState<Guest[]>(initialGuests);
   const [benefits, setBenefits] = useState<Benefit[]>(initialBenefits);
+
+  useEffect(() => {
+    setSponsors(initialSponsors);
+  }, [initialSponsors]);
+
+  useEffect(() => {
+    setGuests(initialGuests);
+  }, [initialGuests]);
+
+  useEffect(() => {
+    setBenefits(initialBenefits);
+  }, [initialBenefits]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [tierFilter, setTierFilter] = useState("");
@@ -120,7 +134,7 @@ export default function SponsorList({
       const res = await createBenefitAction(sponsorId, name, `Added benefit: ${name}`);
       if (!res.error) {
         setNewBenefitName((prev) => ({ ...prev, [sponsorId]: "" }));
-        window.location.reload();
+        router.refresh();
       }
     });
   };
@@ -223,7 +237,7 @@ export default function SponsorList({
         setNsPay("-");
         setNsNonMon("");
         setIsAddSponsorOpen(false);
-        window.location.reload();
+        router.refresh();
       }
     });
   };
@@ -253,7 +267,7 @@ export default function SponsorList({
         setNewGuestPhone((p) => ({ ...p, [sponsorId]: "" }));
         setNewGuestEmail((p) => ({ ...p, [sponsorId]: "" }));
         setNewGuestDate((p) => ({ ...p, [sponsorId]: "" }));
-        window.location.reload();
+        router.refresh();
       }
     });
   };

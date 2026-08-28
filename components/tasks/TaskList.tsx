@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useTransition, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Plus, Search, Calendar, User, Clock, CheckCircle2, Circle, AlertTriangle, Trash } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { createTaskAction, updateTaskAction, deleteTaskAction } from "@/app/dashboard/tasks/actions";
@@ -26,7 +27,12 @@ interface TaskListProps {
 }
 
 export default function TaskList({ initialTasks, users, userRole }: TaskListProps) {
+  const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
+
+  useEffect(() => {
+    setTasks(initialTasks);
+  }, [initialTasks]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -110,7 +116,7 @@ export default function TaskList({ initialTasks, users, userRole }: TaskListProp
       } else {
         setIsAddOpen(false);
         setEditingTask(null);
-        window.location.reload();
+        router.refresh();
       }
     });
   };

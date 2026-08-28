@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useTransition, useRef } from "react";
+import React, { useState, useTransition, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Papa from "papaparse";
 import { Plus, Search, Edit, Trash2, ArrowUpRight, Upload, Download, Loader2, Contact } from "lucide-react";
@@ -36,7 +37,13 @@ interface GuestListProps {
 }
 
 export default function GuestList({ initialGuests, sponsors, userRole }: GuestListProps) {
+  const router = useRouter();
   const [guests, setGuests] = useState<Guest[]>(initialGuests);
+
+  useEffect(() => {
+    setGuests(initialGuests);
+  }, [initialGuests]);
+
   const [activeRoleFilter, setActiveRoleFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -108,7 +115,7 @@ export default function GuestList({ initialGuests, sponsors, userRole }: GuestLi
       if (!res.error) {
         setParsedData(null);
         setImportReason("");
-        window.location.reload();
+        router.refresh();
       } else {
         alert("Import failed: " + res.error);
       }
@@ -416,7 +423,7 @@ export default function GuestList({ initialGuests, sponsors, userRole }: GuestLi
               onClose={() => setIsAddOpen(false)}
               onSuccess={() => {
                 setIsAddOpen(false);
-                window.location.reload();
+                router.refresh();
               }}
             />
           </div>
@@ -436,7 +443,7 @@ export default function GuestList({ initialGuests, sponsors, userRole }: GuestLi
               onClose={() => setEditingGuest(null)}
               onSuccess={() => {
                 setEditingGuest(null);
-                window.location.reload();
+                router.refresh();
               }}
             />
           </div>
