@@ -2,6 +2,7 @@ import React from "react";
 import { createClient } from "@/lib/supabase/server";
 import OverviewCharts from "@/components/dashboard/OverviewCharts";
 import RealtimeFeed from "@/components/dashboard/RealtimeFeed";
+import FulfillmentOverview from "@/components/dashboard/FulfillmentOverview";
 import { formatCurrency } from "@/lib/utils";
 import {
   Award,
@@ -109,6 +110,27 @@ export default async function DashboardPage() {
     .order("created_at", { ascending: false })
     .limit(10);
 
+  // 5. Fetch Fulfillment Items
+  const { data: fulfillmentItems } = await supabase
+    .from("fulfillment_items")
+    .select("*")
+    .order("created_at", { ascending: true });
+
+  // 6. Get Current User Role
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let userRole = "viewer";
+  if (user) {
+    const { data: profile } = await supabase
+      .from("users")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    if (profile) userRole = profile.role;
+  }
+
   // Formatting chart structures
   const tierChartData = Object.entries(tierRevenueMap).map(([key, value]) => ({
     name: key.charAt(0).toUpperCase() + key.slice(1),
@@ -193,6 +215,9 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Benefit Fulfillment Cubicles */}
+      <FulfillmentOverview initialItems={fulfillmentItems || []} userRole={userRole} />
 
       {/* 2. Executive KPIs */}
       <div>

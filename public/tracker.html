@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUPRA SAEINDIA 2026 — Sponsor Guest & Benefits Tracker</title>
+<!-- Supabase Browser SDK CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg: #09090b;
+    --card: #18181b;
+    --border: #27272a;
+    --border-strong: #3f3f46;
+    --text: #f4f4f5;
+    --text-2: #a1a1aa;
+    --text-3: #71717a;
+    --navy: #18181b;
+    --navy-2: #27272a;
+    --red: #ef4444;
+    --amber: #f59e0b;
+    --green: #10b981;
+    --green-bg: rgba(16, 185, 129, 0.1);
+    --red-bg: rgba(239, 68, 68, 0.1);
+    --amber-bg: rgba(245, 158, 11, 0.1);
+    --gray-bg: rgba(113, 113, 122, 0.15);
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    padding-bottom: 80px;
+  }
+  .topbar {
+    background: #09090b;
+    border-bottom: 1px solid var(--border);
+    color: #fff;
+    padding: 20px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    backdrop-filter: blur(10px);
+    background: rgba(9, 9, 11, 0.85);
+  }
+  .topbar-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+  .topbar h1 { margin: 0; font-size: 18px; font-weight: 700; tracking-tight: -.025em; }
+  .topbar .sub { color: var(--text-2); font-size: 11px; margin-top: 3px; }
+  .stripe { height: 3px; background: linear-gradient(90deg, var(--green) 0%, var(--amber) 50%, var(--red) 100%); }
+
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .stat .num { font-size: 24px; font-weight: 800; line-height: 1; color: var(--text); }
+  .stat .lbl { color: var(--text-2); font-size: 10px; margin-top: 8px; font-weight: 600; text-transform: uppercase; tracking-wider: .05em; }
+  .stat.accent-green .num { color: var(--green); }
+  .stat.accent-red .num { color: var(--red); }
+  .stat.accent-amber .num { color: var(--amber); }
+
+  .hero-stat {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: linear-gradient(to bottom right, #18181b, #09090b);
+    border: 1px solid var(--border);
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .hero-stat .icon {
+    width: 48px; height: 48px; border-radius: 10px; background: rgba(255, 255, 255, 0.05);
+    display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+    border: 1px solid var(--border);
+  }
+  .hero-stat .num { font-size: 30px; font-weight: 800; line-height: 1; }
+  .hero-stat .lbl { color: var(--text-2); font-size: 12px; margin-top: 4px; }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .controls input[type=text], .controls select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s;
+  }
+  .controls input[type=text]:focus, .controls select:focus { border-color: var(--border-strong); }
+  .controls input[type=text] { flex: 1; min-width: 200px; }
+  .chip-toggle { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip {
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--text-2);
+    font-weight: 600;
+    user-select: none;
+    transition: all 0.2s;
+  }
+  .chip.active { background: var(--text); border-color: var(--text); color: var(--bg); }
+
+  .sponsor-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .sponsor-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+  }
+  .sponsor-head:hover { background: rgba(255, 255, 255, 0.02); }
+  .sponsor-head.open { border-bottom-color: var(--border); }
+  
+  .tier-badge {
+    font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 6px;
+    text-transform: uppercase; letter-spacing: .05em; white-space: nowrap;
+  }
+  .tier-Principal { background: #fde3e4; color: #96131a; }
+  .tier-Platinum { background: #e7e9f5; color: #3a3f7d; }
+  .tier-Gold { background: #fdf1cf; color: #8a6608; }
+  .tier-Silver { background: #eef0f3; color: #454e5f; }
+  .tier-Bronze { background: #f3e4d6; color: #7a4a1f; }
+  .tier-Lunch { background: #e2f3e9; color: #1c6b3d; }
+  .tier-Other { background: var(--gray-bg); color: var(--text); }
+  .tier-General { background: var(--gray-bg); color: var(--text-2); }
+
+  .sponsor-name { font-weight: 700; font-size: 15px; flex: 1; min-width: 120px; }
+  .sponsor-meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--text-2); }
+  .amount { font-weight: 700; color: var(--text); }
+  .pay-pill { font-size: 10px; padding: 3px 8px; border-radius: 99px; font-weight: 700; text-transform: uppercase; }
+  .pay-received { background: var(--green-bg); color: var(--green); }
+  .pay-pending { background: var(--amber-bg); color: var(--amber); }
+  .guest-count-pill { background: var(--bg); color: var(--text-2); font-size: 11px; padding: 3px 8px; border-radius: 99px; font-weight: 600; border: 1px solid var(--border); }
+  .chevron { transition: transform .15s ease; color: var(--text-3); font-size: 12px; }
+  .chevron.open { transform: rotate(90deg); }
+
+  .sponsor-body { padding: 20px; }
+  .section-label { font-size: 10px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: .05em; margin: 20px 0 10px; }
+
+  .benefits-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 8px;
+  }
+  .benefit-row {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+    border-radius: 8px; background: var(--bg); font-size: 12px; cursor: pointer;
+    border: 1px solid var(--border); justify-content: space-between;
+    transition: border-color 0.2s;
+  }
+  .benefit-row:hover { border-color: var(--border-strong); }
+  .benefit-row.done { background: var(--green-bg); border-color: rgba(16, 185, 129, 0.2); }
+  .benefit-row .check {
+    width: 16px; height: 16px; border-radius: 4px; border: 1px solid var(--border);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--bg);
+    font-size: 10px; color: #fff;
+  }
+  .benefit-row.done .check { background: var(--green); border-color: var(--green); }
+  .benefit-row.done span.txt { color: var(--green); font-weight: 600; }
+  .benefit-row .left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .benefit-row .left span.txt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .status-tag { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 99px; text-transform: uppercase; }
+  .status-tag.done { background: var(--green); color: var(--bg); }
+  .status-tag.pending { background: var(--border); color: var(--text-2); }
+
+  .benefit-progress { font-size: 11px; color: var(--text-2); margin-top: 12px; }
+  .progress-track { height: 6px; background: var(--bg); border-radius: 99px; margin-top: 6px; overflow: hidden; border: 1px solid var(--border); }
+  .progress-fill { height: 100%; background: var(--green); border-radius: 99px; }
+
+  .add-sponsor-toggle {
+    display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 8px;
+    background: var(--text); color: var(--bg); font-size: 13px; font-weight: 750; cursor: pointer; border: none; margin-bottom: 20px;
+    transition: opacity 0.2s;
+  }
+  .add-sponsor-toggle:hover { opacity: 0.9; }
+  
+  .add-sponsor-form {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 20px; margin-bottom: 20px; display: none;
+  }
+  .add-sponsor-form.open { display: block; }
+  .add-sponsor-form .row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+  .add-sponsor-form input, .add-sponsor-form select {
+    background: var(--bg); border: 1px solid var(--border); color: var(--text);
+    padding: 10px 12px; border-radius: 8px; font-size: 13px; flex: 1; min-width: 160px; outline: none;
+  }
+  .add-sponsor-form button {
+    padding: 10px 20px; border: none; border-radius: 8px; background: var(--text); color: var(--bg);
+    font-size: 13px; font-weight: 700; cursor: pointer;
+  }
+
+  table.guest-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+  table.guest-table th {
+    text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: .05em;
+    color: var(--text-3); padding: 8px 10px; border-bottom: 1px solid var(--border); font-weight: 700;
+  }
+  table.guest-table td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  table.guest-table tr:last-child td { border-bottom: none; }
+  td[contenteditable=true] { border-radius: 6px; padding: 4px 8px !important; transition: background 0.2s; }
+  td[contenteditable=true]:hover { background: rgba(255, 255, 255, 0.05); }
+  td[contenteditable=true]:focus { outline: 1px solid var(--border-strong); background: var(--bg); }
+  .del-guest { color: var(--text-3); cursor: pointer; font-size: 14px; }
+  .del-guest:hover { color: var(--red); }
+
+  select.status-select {
+    font-size: 11px; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border);
+    font-weight: 700; cursor: pointer; background: var(--bg); color: var(--text);
+  }
+  .status-Confirmed { background: var(--green-bg) !important; color: var(--green) !important; border-color: rgba(16, 185, 129, 0.2) !important; }
+  .status-Pending { background: var(--amber-bg) !important; color: var(--amber) !important; border-color: rgba(245, 158, 11, 0.2) !important; }
+  .status-Not { background: var(--red-bg) !important; color: var(--red) !important; border-color: rgba(239, 68, 68, 0.2) !important; }
+
+  .gp-toggle {
+    display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+    padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; border: 1px solid var(--border);
+    user-select: none;
+  }
+  .gp-yes { background: var(--green-bg); color: var(--green); border-color: rgba(16, 185, 129, 0.2); }
+  .gp-no { background: var(--bg); color: var(--text-3); }
+
+  .no-guests { color: var(--text-3); font-size: 12px; padding: 12px 0; font-style: italic; }
+
+  .add-guest-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .add-guest-row input {
+    background: var(--bg); border: 1px solid var(--border); color: var(--text);
+    padding: 8px 12px; border-radius: 8px; font-size: 12px; flex: 1; min-width: 120px; outline: none;
+  }
+  .add-guest-row button {
+    padding: 8px 16px; border: none; border-radius: 8px; background: var(--text); color: var(--bg);
+    font-size: 12px; font-weight: 700; cursor: pointer;
+  }
+
+  .section-divider { display: flex; align-items: center; gap: 12px; margin: 36px 0 20px; }
+  .section-divider-line { flex: 1; height: 1px; background: var(--border); }
+  .section-divider-text { font-size: 13px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .05em; }
+
+  .cubicle-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px; margin-bottom: 24px;
+  }
+  .cubicle {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;
+    display: flex; flex-col justify-content: space-between; flex-direction: column;
+  }
+  .cubicle-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
+  .cubicle-title { font-size: 14px; font-weight: 700; color: var(--text); }
+  .cubicle-count { font-size: 26px; font-weight: 800; color: var(--text); }
+  .cubicle-sub { font-size: 11px; color: var(--text-3); margin-bottom: 12px; }
+  .cubicle-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; min-height: 24px; }
+  .cubicle-chip {
+    display: inline-flex; align-items: center; gap: 6px; background: var(--bg); border: 1px solid var(--border);
+    padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; color: var(--text-2);
+  }
+  .cubicle-chip .rm { cursor: pointer; color: var(--text-3); font-weight: 700; }
+  .cubicle-chip .rm:hover { color: var(--red); }
+  .cubicle-add { display: flex; gap: 6px; }
+  .cubicle-add input {
+    flex: 1; padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 12px;
+    background: var(--bg); color: var(--text); outline: none;
+  }
+  .cubicle-add button {
+    padding: 7px 14px; border: none; border-radius: 8px; background: var(--text); color: var(--bg);
+    font-size: 12px; font-weight: 700; cursor: pointer;
+  }
+
+  .team-search {
+    width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px;
+    font-size: 13px; margin-bottom: 12px; background: var(--card); color: var(--text); outline: none;
+  }
+  .team-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 8px; max-height: 400px; overflow-y: auto; padding-right: 4px;
+  }
+  .team-row {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px;
+    background: var(--card); border: 1px solid var(--border); font-size: 12.5px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .team-row:hover { border-color: var(--border-strong); }
+  .team-row.done { background: var(--green-bg); border-color: rgba(16, 185, 129, 0.2); }
+  .team-row .check {
+    width: 16px; height: 16px; border-radius: 4px; border: 1px solid var(--border);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--bg);
+    font-size: 10px; color: #fff;
+  }
+  .team-row.done .check { background: var(--green); border-color: var(--green); }
+  .team-row .tnum { color: var(--text-2); font-weight: 700; font-mono: monospace; font-size: 11px; flex-shrink: 0; }
+  .team-row .tname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-2); }
+  .team-row.done .tname { color: var(--green); font-weight: 600; }
+
+  .save-indicator {
+    position: fixed; bottom: 20px; right: 20px; background: var(--text); color: var(--bg);
+    font-size: 12px; font-weight: 750; padding: 10px 18px; border-radius: 8px; opacity: 0; transition: opacity .3s;
+    pointer-events: none; z-index: 50; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  }
+  .save-indicator.show { opacity: 1; }
+
+  .footer-note { text-align: center; color: var(--text-3); font-size: 11px; margin-top: 48px; }
+  @media(max-width:640px){
+    .sponsor-meta { width: 100%; justify-content: space-between; }
+    table.guest-table { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div>
+      <h1>SUPRA SAEINDIA 2026 — Guest & Sponsor Benefit Tracker</h1>
+      <div class="sub">2–5 September 2026 · Buddh International Circuit, Greater Noida</div>
+    </div>
+    <div class="sub" id="syncIndicator" style="font-weight:700;">Connecting...</div>
+  </div>
+</div>
+<div class="stripe"></div>
+
+<div class="wrap">
+
+  <div class="hero-stat" id="heroStat"></div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="section-divider" style="margin-top:8px;">
+    <div class="section-divider-line"></div>
+    <div class="section-divider-text">Benefit Fulfillment Overview</div>
+    <div class="section-divider-line"></div>
+  </div>
+  <div class="cubicle-grid" id="cubicleGrid"></div>
+
+  <div class="controls">
+    <input type="text" id="search" placeholder="Search guest or sponsor name...">
+    <select id="tierFilter">
+      <option value="">All tiers</option>
+    </select>
+    <div class="chip-toggle">
+      <div class="chip active" data-filter="all">All guests</div>
+      <div class="chip" data-filter="Confirmed">Confirmed</div>
+      <div class="chip" data-filter="Pending">Pending</div>
+      <div class="chip" data-filter="Not">Not coming</div>
+      <div class="chip" data-filter="gp-yes">Gate pass done</div>
+      <div class="chip" data-filter="gp-no">Gate pass pending</div>
+    </div>
+  </div>
+
+  <button class="add-sponsor-toggle" id="showAddSponsor">+ Add new sponsor</button>
+  <div class="add-sponsor-form" id="addSponsorForm">
+    <div class="row">
+      <input type="text" id="ns-name" placeholder="Sponsor name">
+      <select id="ns-tier">
+        <option value="Principal">Principal</option>
+        <option value="Platinum">Platinum</option>
+        <option value="Gold">Gold</option>
+        <option value="Lunch">Lunch</option>
+        <option value="Silver">Silver</option>
+        <option value="Bronze">Bronze</option>
+        <option value="General">General (no benefits — guest list only)</option>
+        <option value="Other">Other / Custom</option>
+      </select>
+      <input type="text" id="ns-tierlabel" placeholder="Custom label (optional, e.g. Kit Partner)">
+    </div>
+    <div class="row">
+      <input type="number" id="ns-amount" placeholder="Amount in Rs (0 if non-monetary)">
+      <select id="ns-pay">
+        <option value="-">No payment tracked</option>
+        <option value="Pending">Pending</option>
+        <option value="Payment Received">Payment received</option>
+      </select>
+      <input type="text" id="ns-nonmon" placeholder="Non-monetary support (optional)">
+    </div>
+    <button id="ns-submit">Add sponsor</button>
+  </div>
+
+  <div id="sponsorList"></div>
+
+  <div class="section-divider">
+    <div class="section-divider-line"></div>
+    <div class="section-divider-text">Vehicle Sticker Placement Tracker</div>
+    <div class="section-divider-line"></div>
+  </div>
+  <div style="color:var(--text-2);font-size:12px;margin-bottom:14px;">
+    Which companies' stickers have been placed on which teams' cars — one checklist of all 61 competing teams per sponsor.
+  </div>
+
+  <button class="add-sponsor-toggle" id="showAddStickerSponsor">+ Add company for stickers</button>
+  <div class="add-sponsor-form" id="addStickerSponsorForm">
+    <div class="row">
+      <input type="text" id="ss-name" placeholder="Company name">
+      <input type="text" id="ss-size" placeholder="Sticker size / notes (optional, e.g. 10x10cm)">
+    </div>
+    <button id="ss-submit">Add company</button>
+  </div>
+
+  <div id="stickerList"></div>
+
+  <div class="section-divider">
+    <div class="section-divider-line"></div>
+    <div class="section-divider-text">Team Vehicle Sticker Status (all companies combined)</div>
+    <div class="section-divider-line"></div>
+  </div>
+  <div style="color:var(--text-2);font-size:12px;margin-bottom:10px;">
+    All 61 competing teams — one quick overall yes/no per car, separate from the per-sponsor checklists above.
+  </div>
+  <input type="text" class="team-search" id="teamStickerSearch" placeholder="Search team name or number...">
+  <div class="team-grid" id="teamStickerList" style="max-height:600px;"></div>
+
+  <div class="footer-note" id="footerNote">Saved automatically to database</div>
+</div>
+
+<div class="save-indicator" id="saveIndicator">Saved</div>
+
+<script>
+// ---------- SEED DATA ----------
+const TIER_BENEFITS = {
+  Principal: ["Stall setup 18x3 mtr","Event branding in company name","Student engagement (webinars/training)","Official seat at valedictory","Non-track branding — 25 spots","Branding on student vehicles (large)","Database of participating teams","Lunch/refreshments for officials","Logo on website/event site/valedictory","Promotional activities onsite","Materials in student kits","Award cheque & trophy branding","Customized branding options","Participation in HR meet"],
+  Platinum: ["Stall setup 9x3 mtr","Student engagement (webinars/training)","Official seat at valedictory","Non-track branding — 15 spots","Branding on student vehicles (medium)","Database of participating teams","Lunch/refreshments for officials","Logo on website/event site/valedictory","Promotional activities onsite","Materials in student kits","Award cheque & trophy branding","Customized branding options","Participation in HR meet"],
+  Gold: ["Stall setup 6x3 mtr","Student engagement (webinars/training)","Non-track branding — 15 spots","Branding on student vehicles (medium)","Database of participating teams","Lunch/refreshments for officials","Logo on website/event site/valedictory","Promotional activities onsite","Materials in student kits","Award cheque & trophy branding","Customized branding options","Participation in HR meet"],
+  Lunch: ["Stall setup 4x3 mtr","Student engagement (webinars/training)","Non-track branding — 10 spots","Branding on student vehicles (7x7cm)","Database of participating teams","Lunch/refreshments for officials","Logo on website/event site/valedictory","Promotional activities onsite","Materials in student kits","Award cheque & trophy branding","Customized branding options","Participation in HR meet"],
+  Silver: ["Stall setup 3x3 mtr","Student engagement (webinars/training)","Non-track branding — 10 spots","Branding on student vehicles (7x7cm)","Database of participating teams","Lunch/refreshments for officials","Logo on website/event site/valedictory","Promotional activities onsite","Materials in student kits","Award cheque & trophy branding","Customized branding options","Participation in HR meet"],
+  Bronze: ["Non-track branding — 5 spots","Lunch/refreshments for officials","Logo on website/event site/valedictory","Promotional activities onsite","Materials in student kits","Award cheque & trophy branding","Customized branding options","Participation in HR meet"],
+  Other: ["Lunch/refreshments for officials","Logo on website/event site/valedictory","Promotional activities onsite","Materials in student kits","Participation in HR meet"],
+  General: []
+};
+
+const TEAMS_SEED = [
+  {num:"EV-01", name:"Amrita Racing"},
+  {num:"EV-02", name:"Team Nequit Electric"},
+  {num:"EV-04", name:"Acceleracers Electric"},
+  {num:"EV-05", name:"Pegasus Racing Electric"},
+  {num:"EV-06", name:"Veerracerss Electric"},
+  {num:"EV-07", name:"Veloce Racing Electric"},
+  {num:"EV-10", name:"NIT-B Racing"},
+  {num:"EV-14", name:"4ZE Racing"},
+  {num:"EV-15", name:"Phoenix Racing Electric"},
+  {num:"EV-16", name:"Invincibles"},
+  {num:"EV-18", name:"CRCE Formula Racing Electric"},
+  {num:"EV-19", name:"Team Fateh"},
+  {num:"EV-20", name:"Team Defianz Racing Electric"},
+  {num:"ICV-01", name:"Team Abhedya Racers"},
+  {num:"ICV-02", name:"Praheti Racing"},
+  {num:"ICV-03", name:"Madbolt Formula Racing"},
+  {num:"ICV-04", name:"Sahayadri Formula Racers"},
+  {num:"ICV-05", name:"Team Srijan"},
+  {num:"ICV-06", name:"Team Godavari"},
+  {num:"ICV-07", name:"Team Mechnext Racing"},
+  {num:"ICV-08", name:"DSCE Motorsports"},
+  {num:"ICV-09", name:"Ares Motorsports"},
+  {num:"ICV-10", name:"Team Adrenaline Racing"},
+  {num:"ICV-11", name:"Team Malaviyans"},
+  {num:"ICV-12", name:"The Elite Racers"},
+  {num:"ICV-13", name:"Yodha Racing"},
+  {num:"ICV-15", name:"Team Brahmastra Formula"},
+  {num:"ICV-17", name:"Bullz Racing"},
+  {num:"ICV-19", name:"Wrench Wielders Racing"},
+  {num:"ICV-20", name:"Javitron Racing"},
+  {num:"ICV-22", name:"Godspeed Racing"},
+  {num:"ICV-23", name:"Team VITian Formula Racing"},
+  {num:"ICV-24", name:"Team Vegadooth Racing"},
+  {num:"ICV-25", name:"Overdrive Racing"},
+  {num:"ICV-26", name:"Team Eminent Racing"},
+  {num:"ICV-29", name:"Team Ashwamedh"},
+  {num:"ICV-30", name:"GTU Motorsports"},
+  {num:"ICV-31", name:"Yeti Racing"},
+  {num:"ICV-32", name:"Hadron Motorsports"},
+  {num:"ICV-33", name:"Team Acceleracers ICV"},
+  {num:"ICV-34", name:"Team Infinity Racers"},
+  {num:"ICV-36", name:"Team Saranyu Racing"},
+  {num:"ICV-37", name:"PetronARC"},
+  {num:"ICV-38", name:"IIITDMJ Racing"},
+  {num:"ICV-39", name:"Force Racing"},
+  {num:"ICV-40", name:"Camber Racing"},
+  {num:"ICV-42", name:"Team Arion"},
+  {num:"ICV-43", name:"Team Lightning"},
+  {num:"ICV-44", name:"Team Thrusters"},
+  {num:"ICV-45", name:"Team Screwdrivers"},
+  {num:"ICV-46", name:"Tarkshya Racing"},
+  {num:"ICV-47", name:"Devbhoomi Dynamo"},
+  {num:"ICV-49", name:"XLR8 Formula Student Team"},
+  {num:"ICV-50", name:"Hermes Racing"},
+  {num:"ICV-51", name:"Speedtail Racing"},
+  {num:"ICV-53", name:"Formula Team Pegasus"},
+  {num:"ICV-55", name:"AIOUS Formula Student"},
+  {num:"ICV-56", name:"Pravega Racing"},
+  {num:"ICV-57", name:"Vishwaracers"},
+  {num:"ICV-58", name:"Team Sakthi Racing"},
+  {num:"ICV-59", name:"Velocita Racing"}
+];
+
+let state = {
+  guestStatus: {},   // key: sponsor|name -> {confirmed:"Pending", gatePass:false}
+  benefitDone: {},   // key: sponsor|benefitIndex -> true
+  extraGuests: [],   
+  extraSponsors: [], 
+  guestEdits: {},    
+  hiddenGuests: [],  
+  cubicles: { stall: [], stickers: [], kits: [] },
+  teamStickerStatus: {},
+  stickerDone: {},   
+  extraStickerSponsors: [] 
+};
+
+// Auto-Sync variables
+let supabase = null;
+let useSupabase = false;
+let SYNC_URL = "";
+let SYNC_KEY = "";
+
+async function initSupabase() {
+  try {
+    const res = await fetch("/api/config");
+    const config = await res.json();
+    if (config.supabaseUrl && config.supabaseAnonKey) {
+      supabase = supabaseJS.createClient(config.supabaseUrl, config.supabaseAnonKey);
+      useSupabase = true;
+      setSyncStatus("Connected to live Supabase DB", true);
+      document.getElementById("footerNote").textContent = "Data saved in real-time to your live Supabase database";
+      await loadFromSupabase();
+    } else {
+      setupLegacyAppsScript();
+    }
+  } catch (e) {
+    console.error("Config API failed, fallback to local settings", e);
+    setupLegacyAppsScript();
+  }
+}
+
+function setupLegacyAppsScript() {
+  SYNC_URL = "https://script.google.com/macros/s/AKfycbyXemMpMUjtSLiNNuZ6YcdiohuAq_vrZtZZSTmYz2HeaTS0faXHOw9NkVxA7JupLqK_-w/exec";
+  SYNC_KEY = "ZtNTtjutFoszxt7OxpMF";
+  setSyncStatus("Syncing via Google Apps Script", true);
+  document.getElementById("footerNote").textContent = "Data saved automatically to Apps Script / Google Sheets";
+  loadState();
+}
+
+async function loadFromSupabase() {
+  try {
+    // 1. Fetch Sponsors & merge into state
+    const { data: dbSponsors } = await supabase.from("sponsors").select("*").is("deleted_at", null);
+    // 2. Fetch Guests
+    const { data: dbGuests } = await supabase.from("guests").select("*, sponsors(sponsor_name)").is("deleted_at", null);
+    // 3. Fetch Benefits
+    const { data: dbBenefits } = await supabase.from("sponsor_benefits").select("*, sponsors(sponsor_name)").is("deleted_at", null);
+    // 4. Fetch Cubicles (Fulfillment)
+    const { data: dbFulfillment } = await supabase.from("fulfillment_items").select("*");
+    // 5. Fetch Stickers
+    const { data: dbStickerCompanies } = await supabase.from("sticker_companies").select("*");
+    const { data: dbStickerPlacements } = await supabase.from("sticker_placements").select("*, sticker_companies(company_name)");
+    const { data: dbTeamStickerStatus } = await supabase.from("team_sticker_status").select("*");
+
+    // Map sponsors
+    state.extraSponsors = (dbSponsors || []).map(sp => ({
+      id: sp.id,
+      name: sp.sponsor_name,
+      tier: sp.sponsor_tier.charAt(0).toUpperCase() + sp.sponsor_tier.slice(1).toLowerCase(),
+      tierLabel: sp.sponsor_tier_label || undefined,
+      amount: parseFloat(sp.sponsorship_amount) || 0,
+      paymentStatus: sp.payment_status,
+      nonMonetary: sp.notes || "-"
+    }));
+
+    // Map guests
+    state.extraGuests = (dbGuests || []).map(g => {
+      const spName = g.sponsors ? g.sponsors.sponsor_name : "General Guests";
+      const key = spName + "|||" + g.guest_name;
+      state.guestStatus[key] = {
+        confirmed: g.attendance_status === "attended" ? "Confirmed" : (g.attendance_status === "declined" ? "Not" : "Pending"),
+        gatePass: g.gatepass_status === "issued" || g.gatepass_status === "scanned"
+      };
+      return {
+        id: g.id,
+        sponsor: spName,
+        name: g.guest_name,
+        designation: g.designation || "-",
+        contact: g.phone || "-",
+        email: g.email || "-",
+        date: g.remarks || "-"
+      };
+    });
+
+    // Map benefits
+    (dbBenefits || []).forEach(b => {
+      const spName = b.sponsors ? b.sponsors.sponsor_name : "";
+      const benefits = TIER_BENEFITS[b.sponsors?.sponsor_tier] || [];
+      const idx = benefits.indexOf(b.benefit_name);
+      if (idx !== -1 && spName) {
+        state.benefitDone[spName + "|||" + idx] = b.status === "completed";
+      }
+    });
+
+    // Map fulfillment cubicles
+    state.cubicles = { stall: [], stickers: [], kits: [] };
+    (dbFulfillment || []).forEach(item => {
+      if (state.cubicles[item.category]) {
+        state.cubicles[item.category].push(item.company_name);
+      }
+    });
+
+    // Map sticker tracker
+    state.extraStickerSponsors = (dbStickerCompanies || []).map(sc => ({
+      id: sc.id,
+      name: sc.company_name,
+      size: sc.sticker_size || ""
+    }));
+
+    (dbStickerPlacements || []).forEach(sp => {
+      const spName = sp.sticker_companies?.company_name || "";
+      if (spName) {
+        state.stickerDone[spName + "|||" + sp.team_number] = sp.is_placed;
+      }
+    });
+
+    (dbTeamStickerStatus || []).forEach(ts => {
+      state.teamStickerStatus[ts.team_number] = ts.is_placed;
+    });
+
+    render();
+  } catch (err) {
+    console.error("Error loading from Supabase:", err);
+  }
+}
+
+async function syncToSupabase(actionType, payload) {
+  if (!useSupabase) return;
+  try {
+    if (actionType === "toggle-benefit") {
+      const [sponsor, idx] = payload.key.split("|||");
+      const benefits = TIER_BENEFITS[payload.tier] || [];
+      const name = benefits[parseInt(idx)];
+      const { data: sp } = await supabase.from("sponsors").select("id").eq("sponsor_name", sponsor).single();
+      if (sp) {
+        await supabase
+          .from("sponsor_benefits")
+          .upsert({
+            sponsor_id: sp.id,
+            benefit_name: name,
+            status: payload.done ? "completed" : "pending"
+          }, { onConflict: "sponsor_id, benefit_name" });
+      }
+    } else if (actionType === "add-sponsor") {
+      await supabase.from("sponsors").insert({
+        sponsor_name: payload.name,
+        sponsor_tier: payload.tier.toLowerCase(),
+        sponsor_tier_label: payload.tierLabel || null,
+        sponsorship_amount: payload.amount,
+        payment_status: payload.paymentStatus,
+        notes: payload.nonMonetary
+      });
+    } else if (actionType === "add-guest") {
+      const { data: sp } = await supabase.from("sponsors").select("id").eq("sponsor_name", payload.sponsor).single();
+      if (sp) {
+        await supabase.from("guests").insert({
+          sponsor_id: sp.id,
+          guest_name: payload.name,
+          designation: payload.designation,
+          phone: payload.contact,
+          email: payload.email,
+          remarks: payload.date
+        });
+      }
+    } else if (actionType === "update-guest") {
+      const { data: guest } = await supabase.from("guests").select("id").eq("guest_name", payload.origName).single();
+      if (guest) {
+        await supabase.from("guests").update({ [payload.field]: payload.val }).eq("id", guest.id);
+      }
+    } else if (actionType === "confirm-guest") {
+      const { data: guest } = await supabase.from("guests").select("id").eq("guest_name", payload.name).single();
+      if (guest) {
+        await supabase.from("guests").update({
+          attendance_status: payload.status === "Confirmed" ? "attended" : (payload.status === "Not" ? "declined" : "pending")
+        }).eq("id", guest.id);
+      }
+    } else if (actionType === "gatepass-guest") {
+      const { data: guest } = await supabase.from("guests").select("id").eq("guest_name", payload.name).single();
+      if (guest) {
+        await supabase.from("guests").update({
+          gatepass_status: payload.gatePass ? "issued" : "not_issued"
+        }).eq("id", guest.id);
+      }
+    } else if (actionType === "delete-guest") {
+      await supabase.from("guests").delete().eq("guest_name", payload.name);
+    } else if (actionType === "add-cubicle") {
+      await supabase.from("fulfillment_items").insert({
+        category: payload.category,
+        company_name: payload.val
+      });
+    } else if (actionType === "remove-cubicle") {
+      await supabase.from("fulfillment_items").delete().eq("category", payload.category).eq("company_name", payload.val);
+    } else if (actionType === "add-sticker-company") {
+      await supabase.from("sticker_companies").insert({
+        company_name: payload.name,
+        sticker_size: payload.size
+      });
+    } else if (actionType === "toggle-sticker-placement") {
+      const { data: sc } = await supabase.from("sticker_companies").select("id").eq("company_name", payload.sponsor).single();
+      if (sc) {
+        await supabase.from("sticker_placements").upsert({
+          company_id: sc.id,
+          team_number: payload.team,
+          is_placed: payload.done
+        }, { onConflict: "company_id, team_number" });
+      }
+    } else if (actionType === "toggle-sticker-overall") {
+      await supabase.from("team_sticker_status").upsert({
+        team_number: payload.team,
+        is_placed: payload.done
+      }, { onConflict: "team_number" });
+    }
+    showSavedNotification();
+  } catch (err) {
+    console.error("Supabase sync failed:", err);
+  }
+}
+
+function showSavedNotification() {
+  const ind = document.getElementById('saveIndicator');
+  ind.classList.add('show');
+  setTimeout(()=>ind.classList.remove('show'), 1200);
+}
+
+// Legacy Apps Script Loader
+let lastSavedSnapshot = "";
+let syncing = false;
+
+async function loadState(silent) {
+  if (SYNC_URL.indexOf('PASTE_YOUR') === 0 || useSupabase) return;
+  try {
+    const res = await fetch(SYNC_URL + '?action=load&key=' + encodeURIComponent(SYNC_KEY) + '&_=' + Date.now());
+    const data = await res.json();
+    if (data && data.value) {
+      const parsed = JSON.parse(data.value);
+      state = Object.assign(state, parsed);
+      lastSavedSnapshot = JSON.stringify(state);
+      render();
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function saveState() {
+  if (useSupabase) return;
+  const snapshot = JSON.stringify(state);
+  if (snapshot === lastSavedSnapshot) return;
+  syncing = true;
+  fetch(SYNC_URL, {
+    method: 'POST',
+    headers: {'Content-Type': 'text/plain;charset=utf-8'},
+    body: JSON.stringify({ value: snapshot, key: SYNC_KEY })
+  }).then(() => {
+    lastSavedSnapshot = snapshot;
+    showSavedNotification();
+  });
+}
+
+function allGuests() {
+  return state.extraGuests;
+}
+
+function allSponsors() {
+  return state.extraSponsors;
+}
+
+// ---------- FILTER STATE ----------
+let activeFilter = "all";
+let searchTerm = "";
+let tierFilterVal = "";
+let openSponsors = new Set();
+
+function matchesFilter(sponsor, g) {
+  const st = state.guestStatus[sponsor + "|||" + g.name] || {confirmed: "Pending"};
+  if (activeFilter === "Confirmed") return st.confirmed === "Confirmed";
+  if (activeFilter === "Pending") return st.confirmed === "Pending";
+  if (activeFilter === "Not") return st.confirmed === "Not";
+  if (activeFilter === "gp-yes") return st.gatePass === true;
+  if (activeFilter === "gp-no") return st.gatePass !== true;
+  return true;
+}
+
+function matchesSearch(sponsor, g) {
+  if (!searchTerm) return true;
+  const t = searchTerm.toLowerCase();
+  return sponsor.toLowerCase().includes(t) || g.name.toLowerCase().includes(t);
+}
+
+function computeStats() {
+  const guests = allGuests();
+  let confirmed = 0, pending = 0, not = 0, gpYes = 0, gpNo = 0;
+  guests.forEach(g => {
+    const st = state.guestStatus[g.sponsor + "|||" + g.name] || {confirmed: "Pending"};
+    if (st.confirmed === "Confirmed") confirmed++;
+    else if (st.confirmed === "Not") not++;
+    else pending++;
+    if (st.gatePass) gpYes++; else gpNo++;
+  });
+  return {total: guests.length, confirmed, pending, not, gpYes, gpNo, sponsors: allSponsors().length};
+}
+
+function renderStats() {
+  const s = computeStats();
+  const hero = document.getElementById('heroStat');
+  hero.innerHTML = `
+    <div class="icon">👥</div>
+    <div>
+      <div class="num">${s.total}</div>
+      <div class="lbl">Total guests across all sponsors (${s.sponsors} sponsors)</div>
+    </div>
+  `;
+  const el = document.getElementById('stats');
+  el.innerHTML = `
+    <div class="stat"><div class="num">${s.total}</div><div class="lbl">Total guests</div></div>
+    <div class="stat accent-green"><div class="num">${s.confirmed}</div><div class="lbl">Confirmed coming</div></div>
+    <div class="stat accent-amber"><div class="num">${s.pending}</div><div class="lbl">Pending confirmation</div></div>
+    <div class="stat accent-red"><div class="num">${s.not}</div><div class="lbl">Not coming</div></div>
+    <div class="stat accent-green"><div class="num">${s.gpYes}</div><div class="lbl">Gate pass issued</div></div>
+    <div class="stat accent-amber"><div class="num">${s.gpNo}</div><div class="lbl">Gate pass pending</div></div>
+    <div class="stat"><div class="num">${s.sponsors}</div><div class="lbl">Total sponsors</div></div>
+  `;
+}
+
+function populateTierFilter() {
+  const sel = document.getElementById('tierFilter');
+  if (sel.options.length > 1) return;
+  const tiers = [...new Set(allSponsors().map(sp => sp.tier))];
+  tiers.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t; opt.textContent = t;
+    sel.appendChild(opt);
+  });
+}
+
+function renderSponsorCard(sp) {
+  const guests = allGuests().filter(g => g.sponsor === sp.name);
+  const visibleGuests = guests.filter(g => matchesFilter(sp.name, g) && matchesSearch(sp.name, g));
+
+  if (tierFilterVal && sp.tier !== tierFilterVal) return "";
+  if (searchTerm && !sp.name.toLowerCase().includes(searchTerm.toLowerCase()) && visibleGuests.length === 0) return "";
+  if (activeFilter !== "all" && visibleGuests.length === 0 && guests.length > 0) return "";
+
+  const isOpen = openSponsors.has(sp.name);
+  const benefits = TIER_BENEFITS[sp.tier] || TIER_BENEFITS.Other;
+  const doneCount = benefits.reduce((acc, _, idx) => acc + (state.benefitDone[sp.name + "|||" + idx] ? 1 : 0), 0);
+  const pct = benefits.length ? Math.round(doneCount / benefits.length * 100) : 0;
+
+  const payClass = sp.paymentStatus === "Payment Received" ? "pay-received" : (sp.paymentStatus === "-" ? "" : "pay-pending");
+
+  let guestRows = "";
+  if (guests.length === 0) {
+    guestRows = `<div class="no-guests">No guests added for this sponsor yet.</div>`;
+  } else if (visibleGuests.length === 0) {
+    guestRows = `<div class="no-guests">No guests match the current filter.</div>`;
+  } else {
+    guestRows = `<table class="guest-table"><thead><tr>
+      <th>Guest (edit inline)</th><th>Designation</th><th>Contact</th><th>Email</th><th>Expected date</th><th>Confirmation</th><th>Gate pass</th><th></th>
+    </tr></thead><tbody>`;
+    visibleGuests.forEach(g => {
+      const st = state.guestStatus[sp.name + "|||" + g.name] || {confirmed: "Pending", gatePass: false};
+      guestRows += `<tr>
+        <td contenteditable="true" data-edit-sponsor="${sp.name}" data-edit-orig="${g.name}" data-edit-field="guest_name">${g.name}</td>
+        <td contenteditable="true" data-edit-sponsor="${sp.name}" data-edit-orig="${g.name}" data-edit-field="designation">${g.designation || ''}</td>
+        <td contenteditable="true" data-edit-sponsor="${sp.name}" data-edit-orig="${g.name}" data-edit-field="phone">${g.contact || ''}</td>
+        <td contenteditable="true" data-edit-sponsor="${sp.name}" data-edit-orig="${g.name}" data-edit-field="email">${g.email || ''}</td>
+        <td contenteditable="true" data-edit-sponsor="${sp.name}" data-edit-orig="${g.name}" data-edit-field="remarks">${g.date || ''}</td>
+        <td>
+          <select class="status-select status-${st.confirmed}" data-guest-sponsor="${sp.name}" data-guest-name="${g.name}" data-action="confirm">
+            <option value="Pending" ${st.confirmed === 'Pending' ? 'selected' : ''}>Pending</option>
+            <option value="Confirmed" ${st.confirmed === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+            <option value="Not" ${st.confirmed === 'Not' ? 'selected' : ''}>Not coming</option>
+          </select>
+        </td>
+        <td>
+          <div class="gp-toggle ${st.gatePass ? 'gp-yes' : 'gp-no'}" data-guest-sponsor="${sp.name}" data-guest-name="${g.name}" data-action="gatepass">
+            ${st.gatePass ? '&#10003; Issued' : 'Not issued'}
+          </div>
+        </td>
+        <td><span class="del-guest" data-del-sponsor="${sp.name}" data-del-name="${g.name}">&times;</span></td>
+      </tr>`;
+    });
+    guestRows += `</tbody></table>`;
+  }
+
+  return `
+  <div class="sponsor-card">
+    <div class="sponsor-head ${isOpen ? 'open' : ''}" data-toggle="${sp.name}">
+      <span class="chevron ${isOpen ? 'open' : ''}">&#9656;</span>
+      <span class="tier-badge tier-${sp.tier}">${sp.tierLabel || sp.tier}</span>
+      <span class="sponsor-name">${sp.name}</span>
+      <div class="sponsor-meta">
+        <span class="amount">${sp.amount ? "&#8377;" + sp.amount.toLocaleString('en-IN') : "Non-monetary"}</span>
+        ${sp.paymentStatus && sp.paymentStatus !== "-" ? `<span class="pay-pill ${payClass}">${sp.paymentStatus}</span>` : ''}
+        <span class="guest-count-pill">${guests.length} guest${guests.length !== 1 ? 's' : ''}</span>
+        ${benefits.length > 0 ? `<span class="guest-count-pill">${doneCount}/${benefits.length} benefits done</span>` : ''}
+      </div>
+    </div>
+    <div class="sponsor-body" style="display:${isOpen ? 'block' : 'none'}">
+      ${benefits.length > 0 ? `
+      <div class="section-label">Entitled benefits (${sp.tierLabel || sp.tier} tier) — click to mark delivered</div>
+      <div class="benefits-grid">
+        ${benefits.map((b, idx) => {
+          const key = sp.name + "|||" + idx;
+          const done = !!state.benefitDone[key];
+          return `<div class="benefit-row ${done ? 'done' : ''}" data-benefit-key="${key}" data-benefit-tier="${sp.tier}">
+            <div class="left">
+              <div class="check">${done ? '&#10003;' : ''}</div>
+              <span class="txt">${b}</span>
+            </div>
+            <span class="status-tag ${done ? 'done' : 'pending'}">${done ? 'Done' : 'Not done'}</span>
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="benefit-progress">
+        {doneCount} of {benefits.length} benefits delivered
+        <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+      </div>
+      ` : `<div class="no-guests" style="padding-top:6px;">No sponsor benefits apply.</div>`}
+
+      <div class="section-label">Guest list</div>
+      ${guestRows}
+      <div class="add-guest-row">
+        <input type="text" placeholder="Guest name" data-new-name-for="${sp.name}">
+        <input type="text" placeholder="Designation" data-new-designation-for="${sp.name}">
+        <input type="text" placeholder="Contact" data-new-contact-for="${sp.name}">
+        <input type="text" placeholder="Email" data-new-email-for="${sp.name}">
+        <input type="text" placeholder="Expected date" data-new-date-for="${sp.name}">
+        <button data-add-guest-for="${sp.name}">Add guest</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function render() {
+  renderStats();
+  renderCubicles();
+  populateTierFilter();
+  const container = document.getElementById('sponsorList');
+  let html = "";
+  allSponsors().forEach(sp => {
+    html += renderSponsorCard(sp);
+  });
+  container.innerHTML = html;
+  renderStickerSection();
+  renderTeamStickerList();
+  attachHandlers();
+}
+
+// ---------- VEHICLE STICKER TRACKER ----------
+let openStickerSponsors = new Set();
+let stickerSearch = {};
+
+function allStickerSponsors() {
+  return state.extraStickerSponsors;
+}
+
+function renderStickerSection() {
+  const container = document.getElementById('stickerList');
+  let html = "";
+  allStickerSponsors().forEach(sp => {
+    const search = (stickerSearch[sp.name] || "").toLowerCase();
+    const filteredTeams = TEAMS_SEED.filter(t =>
+      !search || t.name.toLowerCase().includes(search) || t.num.toLowerCase().includes(search)
+    );
+    const doneCount = TEAMS_SEED.reduce((acc, t) => acc + (state.stickerDone[sp.name + "|||" + t.num] ? 1 : 0), 0);
+    const pct = Math.round(doneCount / TEAMS_SEED.length * 100) || 0;
+    const isOpen = openStickerSponsors.has(sp.name);
+
+    html += `
+    <div class="sponsor-card">
+      <div class="sponsor-head ${isOpen ? 'open' : ''}" data-sticker-toggle="${sp.name}">
+        <span class="chevron ${isOpen ? 'open' : ''}">&#9656;</span>
+        <span class="tier-badge tier-Other">Vehicle sticker</span>
+        <span class="sponsor-name">${sp.name}</span>
+        <div class="sponsor-meta">
+          ${sp.size ? `<span class="guest-count-pill">${sp.size}</span>` : ''}
+          <span class="guest-count-pill">${doneCount}/${TEAMS_SEED.length} cars done</span>
+        </div>
+      </div>
+      <div class="sponsor-body" style="display:${isOpen ? 'block' : 'none'}">
+        <div class="benefit-progress" style="margin-top:10px;">
+          ${doneCount} of ${TEAMS_SEED.length} team cars stickered
+          <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+        </div>
+        <input type="text" class="team-search" placeholder="Search team name or number..." data-team-search-for="${sp.name}" value="${stickerSearch[sp.name] || ''}">
+        <div class="team-grid">
+          ${filteredTeams.map(t => {
+            const done = !!state.stickerDone[sp.name + "|||" + t.num];
+            return `<div class="team-row ${done ? 'done' : ''}" data-sticker-sponsor="${sp.name}" data-sticker-team="${t.num}">
+              <div class="check">${done ? '&#10003;' : ''}</div>
+              <span class="tnum">${t.num}</span>
+              <span class="tname">${t.name}</span>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html;
+  attachStickerHandlers();
+}
+
+function attachStickerHandlers() {
+  document.querySelectorAll('[data-sticker-toggle]').forEach(el => {
+    el.addEventListener('click', () => {
+      const name = el.getAttribute('data-sticker-toggle');
+      if (openStickerSponsors.has(name)) openStickerSponsors.delete(name);
+      else openStickerSponsors.add(name);
+      renderStickerSection();
+    });
+  });
+  document.querySelectorAll('[data-sticker-sponsor][data-sticker-team]').forEach(el => {
+    el.addEventListener('click', async () => {
+      const sponsor = el.getAttribute('data-sticker-sponsor');
+      const team = el.getAttribute('data-sticker-team');
+      const key = sponsor + "|||" + team;
+      state.stickerDone[key] = !state.stickerDone[key];
+      if (useSupabase) {
+        await syncToSupabase("toggle-sticker-placement", { sponsor, team, done: state.stickerDone[key] });
+      } else {
+        saveState();
+      }
+      renderStickerSection();
+    });
+  });
+  document.querySelectorAll('[data-team-search-for]').forEach(el => {
+    el.addEventListener('input', () => {
+      const sponsor = el.getAttribute('data-team-search-for');
+      stickerSearch[sponsor] = el.value;
+      renderStickerSection();
+    });
+  });
+}
+
+// ---------- BENEFIT FULFILLMENT CUBICLES ----------
+const CUBICLE_DEFS = [
+  {key:'stall', title:'Stall Setup', sub:'Companies that need a stall set up onsite'},
+  {key:'stickers', title:'Vehicle Stickers', sub:'Companies wanting their sticker on student cars'},
+  {key:'kits', title:'Materials in Student Kits', sub:'Companies providing material for kits'}
+];
+
+function renderCubicles() {
+  const container = document.getElementById('cubicleGrid');
+  let html = "";
+  CUBICLE_DEFS.forEach(def => {
+    const list = state.cubicles[def.key] || [];
+    html += `
+    <div class="cubicle">
+      <div class="cubicle-head">
+        <span class="cubicle-title">${def.title}</span>
+        <span class="cubicle-count">${list.length}</span>
+      </div>
+      <div class="cubicle-sub">${def.sub}</div>
+      <div class="cubicle-chips">
+        ${list.map((name, idx) => `<span class="cubicle-chip">${name}<span class="rm" data-cubicle-rm="${def.key}" data-cubicle-val="${name}">&times;</span></span>`).join('') || '<span style="color:var(--text-3);font-size:12px;">None added yet</span>'}
+      </div>
+      <div class="cubicle-add">
+        <input type="text" placeholder="Company name" data-cubicle-input="${def.key}">
+        <button data-cubicle-add="${def.key}">Add</button>
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html;
+  attachCubicleHandlers();
+}
+
+function attachCubicleHandlers() {
+  document.querySelectorAll('[data-cubicle-add]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const key = btn.getAttribute('data-cubicle-add');
+      const input = document.querySelector(`[data-cubicle-input="${key}"]`);
+      const val = input.value.trim();
+      if (!val) return;
+      if (!state.cubicles[key]) state.cubicles[key] = [];
+      state.cubicles[key].push(val);
+      if (useSupabase) {
+        await syncToSupabase("add-cubicle", { category: key, val });
+      } else {
+        saveState();
+      }
+      input.value = "";
+      renderCubicles();
+    });
+  });
+  document.querySelectorAll('[data-cubicle-rm]').forEach(el => {
+    el.addEventListener('click', async () => {
+      const key = el.getAttribute('data-cubicle-rm');
+      const val = el.getAttribute('data-cubicle-val');
+      state.cubicles[key] = state.cubicles[key].filter(v => v !== val);
+      if (useSupabase) {
+        await syncToSupabase("remove-cubicle", { category: key, val });
+      } else {
+        saveState();
+      }
+      renderCubicles();
+    });
+  });
+}
+
+// ---------- TEAM VEHICLE STICKER STATUS ----------
+let teamStickerSearchTerm = "";
+
+function renderTeamStickerList() {
+  const container = document.getElementById('teamStickerList');
+  if (!container) return;
+  const term = teamStickerSearchTerm.toLowerCase();
+  const filtered = TEAMS_SEED.filter(t => !term || t.name.toLowerCase().includes(term) || t.num.toLowerCase().includes(term));
+  container.innerHTML = filtered.map(t => {
+    const done = !!state.teamStickerStatus[t.num];
+    return `<div class="team-row ${done ? 'done' : ''}" data-team-sticker="${t.num}">
+      <div class="check">${done ? '&#10003;' : ''}</div>
+      <span class="tnum">${t.num}</span>
+      <span class="tname">${t.name}</span>
+    </div>`;
+  }).join('');
+
+  container.querySelectorAll('[data-team-sticker]').forEach(el => {
+    el.addEventListener('click', async () => {
+      const num = el.getAttribute('data-team-sticker');
+      state.teamStickerStatus[num] = !state.teamStickerStatus[num];
+      if (useSupabase) {
+        await syncToSupabase("toggle-sticker-overall", { team: num, done: state.teamStickerStatus[num] });
+      } else {
+        saveState();
+      }
+      renderTeamStickerList();
+    });
+  });
+}
+
+document.getElementById('teamStickerSearch').addEventListener('input', (e) => {
+  teamStickerSearchTerm = e.target.value;
+  renderTeamStickerList();
+});
+
+function attachHandlers() {
+  document.querySelectorAll('[data-toggle]').forEach(el => {
+    el.addEventListener('click', () => {
+      const name = el.getAttribute('data-toggle');
+      if (openSponsors.has(name)) openSponsors.delete(name);
+      else openSponsors.add(name);
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-benefit-key]').forEach(el => {
+    el.addEventListener('click', async () => {
+      const key = el.getAttribute('data-benefit-key');
+      const tier = el.getAttribute('data-benefit-tier');
+      state.benefitDone[key] = !state.benefitDone[key];
+      if (useSupabase) {
+        await syncToSupabase("toggle-benefit", { key, tier, done: state.benefitDone[key] });
+      } else {
+        saveState();
+      }
+      render();
+    });
+  });
+
+  document.querySelectorAll('select[data-action="confirm"]').forEach(el => {
+    el.addEventListener('change', async () => {
+      const sponsor = el.getAttribute('data-guest-sponsor');
+      const name = el.getAttribute('data-guest-name');
+      const st = state.guestStatus[sponsor + "|||" + name] || {confirmed: "Pending"};
+      st.confirmed = el.value;
+      if (useSupabase) {
+        await syncToSupabase("confirm-guest", { name, status: el.value });
+      } else {
+        saveState();
+      }
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-action="gatepass"]').forEach(el => {
+    el.addEventListener('click', async () => {
+      const sponsor = el.getAttribute('data-guest-sponsor');
+      const name = el.getAttribute('data-guest-name');
+      const st = state.guestStatus[sponsor + "|||" + name] || {confirmed: "Pending", gatePass: false};
+      st.gatePass = !st.gatePass;
+      if (useSupabase) {
+        await syncToSupabase("gatepass-guest", { name, gatePass: st.gatePass });
+      } else {
+        saveState();
+      }
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-add-guest-for]').forEach(el => {
+    el.addEventListener('click', async () => {
+      const sponsor = el.getAttribute('data-add-guest-for');
+      const nameInput = document.querySelector(`[data-new-name-for="${sponsor}"]`);
+      const designationInput = document.querySelector(`[data-new-designation-for="${sponsor}"]`);
+      const contactInput = document.querySelector(`[data-new-contact-for="${sponsor}"]`);
+      const emailInput = document.querySelector(`[data-new-email-for="${sponsor}"]`);
+      const dateInput = document.querySelector(`[data-new-date-for="${sponsor}"]`);
+      const name = nameInput.value.trim();
+      if (!name) return;
+      
+      const payload = {
+        sponsor, name,
+        designation: designationInput.value.trim(),
+        contact: contactInput.value.trim(),
+        email: emailInput.value.trim(),
+        date: dateInput.value.trim()
+      };
+      
+      state.extraGuests.push(payload);
+      state.guestStatus[sponsor + "|||" + name] = { confirmed: "Pending", gatePass: false };
+      openSponsors.add(sponsor);
+      
+      if (useSupabase) {
+        await syncToSupabase("add-guest", payload);
+      } else {
+        saveState();
+      }
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-del-sponsor]').forEach(el => {
+    el.addEventListener('click', async () => {
+      const sponsor = el.getAttribute('data-del-sponsor');
+      const name = el.getAttribute('data-del-name');
+      if (!confirm(`Remove ${name} from ${sponsor}'s guest list?`)) return;
+      state.extraGuests = state.extraGuests.filter(g => !(g.sponsor === sponsor && g.name === name));
+      if (useSupabase) {
+        await syncToSupabase("delete-guest", { name });
+      } else {
+        saveState();
+      }
+      render();
+    });
+  });
+
+  document.querySelectorAll('td[contenteditable=true]').forEach(el => {
+    el.addEventListener('blur', async () => {
+      const sponsor = el.getAttribute('data-edit-sponsor');
+      const origName = el.getAttribute('data-edit-orig');
+      const field = el.getAttribute('data-edit-field');
+      const val = el.textContent.trim();
+      const g = state.extraGuests.find(item => item.sponsor === sponsor && item.name === origName);
+      if (g) {
+        g[field] = val;
+        if (field === "guest_name") g.name = val;
+      }
+      if (useSupabase) {
+        await syncToSupabase("update-guest", { origName, field, val });
+      } else {
+        saveState();
+      }
+    });
+  });
+}
+
+document.getElementById('showAddSponsor').addEventListener('click', () => {
+  document.getElementById('addSponsorForm').classList.toggle('open');
+});
+
+document.getElementById('ns-submit').addEventListener('click', async () => {
+  const name = document.getElementById('ns-name').value.trim();
+  if (!name) return;
+  const tier = document.getElementById('ns-tier').value;
+  const tierLabel = document.getElementById('ns-tierlabel').value.trim();
+  const amount = parseInt(document.getElementById('ns-amount').value) || 0;
+  const paymentStatus = document.getElementById('ns-pay').value;
+  const nonMonetary = document.getElementById('ns-nonmon').value.trim() || '-';
+  
+  const payload = {
+    name, tier,
+    tierLabel: tierLabel || undefined,
+    amount, paymentStatus, nonMonetary
+  };
+  state.extraSponsors.push(payload);
+  
+  if (useSupabase) {
+    await syncToSupabase("add-sponsor", payload);
+  } else {
+    saveState();
+  }
+  
+  document.getElementById('ns-name').value = '';
+  document.getElementById('ns-tierlabel').value = '';
+  document.getElementById('ns-amount').value = '';
+  document.getElementById('ns-nonmon').value = '';
+  document.getElementById('addSponsorForm').classList.remove('open');
+  render();
+});
+
+document.getElementById('showAddStickerSponsor').addEventListener('click', () => {
+  document.getElementById('addStickerSponsorForm').classList.toggle('open');
+});
+
+document.getElementById('ss-submit').addEventListener('click', async () => {
+  const name = document.getElementById('ss-name').value.trim();
+  if (!name) return;
+  const size = document.getElementById('ss-size').value.trim();
+  
+  state.extraStickerSponsors.push({ name, size });
+  if (useSupabase) {
+    await syncToSupabase("add-sticker-company", { name, size });
+  } else {
+    saveState();
+  }
+  
+  document.getElementById('ss-name').value = '';
+  document.getElementById('ss-size').value = '';
+  document.getElementById('addStickerSponsorForm').classList.remove('open');
+  openStickerSponsors.add(name);
+  renderStickerSection();
+});
+
+function setSyncStatus(text, ok) {
+  const ind = document.getElementById('syncIndicator');
+  if (!ind) return;
+  ind.textContent = text;
+  ind.style.color = ok ? '#10b981' : '#ef4444';
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  searchTerm = e.target.value;
+  render();
+});
+document.getElementById('tierFilter').addEventListener('change', (e) => {
+  tierFilterVal = e.target.value;
+  render();
+});
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeFilter = chip.getAttribute('data-filter');
+    render();
+  });
+});
+
+initSupabase();
+</script>
+</body>
+</html>
