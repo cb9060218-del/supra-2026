@@ -7,332 +7,293 @@
 <!-- Supabase Browser SDK CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  :root {
-    --bg: #09090b;
-    --card: #18181b;
-    --border: #27272a;
-    --border-strong: #3f3f46;
-    --text: #f4f4f5;
-    --text-2: #a1a1aa;
-    --text-3: #71717a;
-    --navy: #18181b;
-    --navy-2: #27272a;
-    --red: #ef4444;
-    --amber: #f59e0b;
-    --green: #10b981;
-    --green-bg: rgba(16, 185, 129, 0.1);
-    --red-bg: rgba(239, 68, 68, 0.1);
-    --amber-bg: rgba(245, 158, 11, 0.1);
-    --gray-bg: rgba(113, 113, 122, 0.15);
-    --radius: 12px;
+  :root{
+    --navy:#0b1f45; --navy-2:#12285c; --red:#d81f26; --amber:#f5a623;
+    --bg:#f4f5f7; --card:#ffffff; --border:#e2e5ea; --border-strong:#c7ccd6;
+    --text:#1b2233; --text-2:#5b6478; --text-3:#8a92a3;
+    --green:#1c8a4b; --green-bg:#e6f6ec;
+    --red-bg:#fdeaea; --amber-bg:#fef4e2;
+    --gray-bg:#eef0f3;
+    --radius:10px;
   }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    font-size: 14px;
-    padding-bottom: 80px;
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--text); font-size:14px;
   }
-  .topbar {
-    background: #09090b;
-    border-bottom: 1px solid var(--border);
-    color: #fff;
-    padding: 20px 24px;
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    backdrop-filter: blur(10px);
-    background: rgba(9, 9, 11, 0.85);
+  .topbar{
+    background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);
+    color:#fff; padding:20px 24px; position:sticky; top:0; z-index:20;
+    box-shadow:0 2px 8px rgba(0,0,0,0.15);
   }
-  .topbar-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-  .topbar h1 { margin: 0; font-size: 18px; font-weight: 700; tracking-tight: -.025em; }
-  .topbar .sub { color: var(--text-2); font-size: 11px; margin-top: 3px; }
-  .stripe { height: 3px; background: linear-gradient(90deg, var(--green) 0%, var(--amber) 50%, var(--red) 100%); }
+  .topbar-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;}
+  .topbar h1{margin:0; font-size:19px; font-weight:600; letter-spacing:.2px;}
+  .topbar .sub{color:#b9c3de; font-size:12.5px; margin-top:3px;}
+  .stripe{height:4px;background:repeating-linear-gradient(45deg,var(--red) 0 14px,#fff 14px 28px);}
 
-  .wrap { max-width: 1200px; margin: 0 auto; padding: 24px; }
+  .wrap{max-width:1200px;margin:0 auto;padding:20px 24px 60px;}
 
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 12px;
-    margin-bottom: 24px;
+  .stats{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:12px; margin-bottom:22px;
   }
-  .stat {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px;
+  .stat{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+    padding:14px 16px; position:relative; overflow:hidden;
   }
-  .stat .num { font-size: 24px; font-weight: 800; line-height: 1; color: var(--text); }
-  .stat .lbl { color: var(--text-2); font-size: 10px; margin-top: 8px; font-weight: 600; text-transform: uppercase; tracking-wider: .05em; }
-  .stat.accent-green .num { color: var(--green); }
-  .stat.accent-red .num { color: var(--red); }
-  .stat.accent-amber .num { color: var(--amber); }
+  .stat .num{font-size:26px;font-weight:700;line-height:1;}
+  .stat .lbl{color:var(--text-2);font-size:12px;margin-top:6px;}
+  .stat.accent-green .num{color:var(--green);}
+  .stat.accent-red .num{color:var(--red);}
+  .stat.accent-amber .num{color:#b9760a;}
+  .stat.accent-navy .num{color:var(--navy);}
 
-  .hero-stat {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    background: linear-gradient(to bottom right, #18181b, #09090b);
-    border: 1px solid var(--border);
-    color: #fff;
-    border-radius: var(--radius);
-    padding: 20px 24px;
-    margin-bottom: 20px;
+  .hero-stat{
+    display:flex; align-items:center; gap:16px;
+    background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);
+    color:#fff; border-radius:12px; padding:18px 22px; margin-bottom:16px;
   }
-  .hero-stat .icon {
-    width: 48px; height: 48px; border-radius: 10px; background: rgba(255, 255, 255, 0.05);
-    display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
-    border: 1px solid var(--border);
+  .hero-stat .icon{
+    width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.15);
+    display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;
   }
-  .hero-stat .num { font-size: 30px; font-weight: 800; line-height: 1; }
-  .hero-stat .lbl { color: var(--text-2); font-size: 12px; margin-top: 4px; }
+  .hero-stat .num{font-size:32px;font-weight:700;line-height:1;}
+  .hero-stat .lbl{color:#c3cbe3;font-size:12.5px;margin-top:3px;}
 
-  .controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: center;
-    margin-bottom: 20px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px;
+  .controls{
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:18px;
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+    padding:12px 14px;
   }
-  .controls input[type=text], .controls select {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 10px 14px;
-    border-radius: 8px;
-    font-size: 13px;
-    outline: none;
-    transition: all 0.2s;
+  .controls input[type=text]{
+    flex:1; min-width:180px; padding:8px 10px; border:1px solid var(--border-strong);
+    border-radius:7px; font-size:13.5px; outline:none;
   }
-  .controls input[type=text]:focus, .controls select:focus { border-color: var(--border-strong); }
-  .controls input[type=text] { flex: 1; min-width: 200px; }
-  .chip-toggle { display: flex; gap: 8px; flex-wrap: wrap; }
-  .chip {
-    padding: 8px 14px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    font-size: 12px;
-    cursor: pointer;
-    color: var(--text-2);
-    font-weight: 600;
-    user-select: none;
-    transition: all 0.2s;
+  .controls input[type=text]:focus{border-color:var(--navy);}
+  .controls select{
+    padding:8px 10px; border:1px solid var(--border-strong); border-radius:7px;
+    font-size:13.5px; background:#fff;
   }
-  .chip.active { background: var(--text); border-color: var(--text); color: var(--bg); }
+  .chip-toggle{
+    display:flex; gap:6px; flex-wrap:wrap;
+  }
+  .chip{
+    padding:6px 12px; border-radius:999px; border:1px solid var(--border-strong);
+    background:#fff; font-size:12.5px; cursor:pointer; color:var(--text-2); user-select:none;
+    white-space:nowrap;
+  }
+  .chip.active{background:var(--navy); border-color:var(--navy); color:#fff;}
 
-  .sponsor-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    margin-bottom: 16px;
-    overflow: hidden;
+  .sponsor-card{
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    margin-bottom:16px; overflow:hidden;
   }
-  .sponsor-head {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 16px 20px;
-    cursor: pointer;
-    border-bottom: 1px solid transparent;
+  .sponsor-head{
+    display:flex; align-items:center; gap:14px; padding:14px 18px; cursor:pointer;
+    border-bottom:1px solid transparent;
   }
-  .sponsor-head:hover { background: rgba(255, 255, 255, 0.02); }
-  .sponsor-head.open { border-bottom-color: var(--border); }
-  
-  .tier-badge {
-    font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 6px;
-    text-transform: uppercase; letter-spacing: .05em; white-space: nowrap;
+  .sponsor-head:hover{background:#fafbfc;}
+  .sponsor-head.open{border-bottom-color:var(--border);}
+  .tier-badge{
+    font-size:11px; font-weight:700; padding:4px 10px; border-radius:6px;
+    text-transform:uppercase; letter-spacing:.4px; white-space:nowrap;
   }
-  .tier-Principal { background: #fde3e4; color: #96131a; }
-  .tier-Platinum { background: #e7e9f5; color: #3a3f7d; }
-  .tier-Gold { background: #fdf1cf; color: #8a6608; }
-  .tier-Silver { background: #eef0f3; color: #454e5f; }
-  .tier-Bronze { background: #f3e4d6; color: #7a4a1f; }
-  .tier-Lunch { background: #e2f3e9; color: #1c6b3d; }
-  .tier-Other { background: var(--gray-bg); color: var(--text); }
-  .tier-General { background: var(--gray-bg); color: var(--text-2); }
+  .tier-Principal{background:#fde3e4;color:#96131a;}
+  .tier-Platinum{background:#e7e9f5;color:#3a3f7d;}
+  .tier-Gold{background:#fdf1cf;color:#8a6608;}
+  .tier-Silver{background:#eef0f3;color:#454e5f;}
+  .tier-Bronze{background:#f3e4d6;color:#7a4a1f;}
+  .tier-Lunch{background:#e2f3e9;color:#1c6b3d;}
+  .tier-Other{background:#eef0f3;color:#454e5f;}
+  .tier-General{background:#e7e9f5;color:#3a3f7d;}
 
-  .sponsor-name { font-weight: 700; font-size: 15px; flex: 1; min-width: 120px; }
-  .sponsor-meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--text-2); }
-  .amount { font-weight: 700; color: var(--text); }
-  .pay-pill { font-size: 10px; padding: 3px 8px; border-radius: 99px; font-weight: 700; text-transform: uppercase; }
-  .pay-received { background: var(--green-bg); color: var(--green); }
-  .pay-pending { background: var(--amber-bg); color: var(--amber); }
-  .guest-count-pill { background: var(--bg); color: var(--text-2); font-size: 11px; padding: 3px 8px; border-radius: 99px; font-weight: 600; border: 1px solid var(--border); }
-  .chevron { transition: transform .15s ease; color: var(--text-3); font-size: 12px; }
-  .chevron.open { transform: rotate(90deg); }
+  .sponsor-name{font-weight:600;font-size:15px;flex:1;min-width:120px;}
+  .sponsor-meta{display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--text-2);}
+  .amount{font-weight:600;color:var(--text);}
+  .pay-pill{
+    font-size:11px; padding:3px 9px; border-radius:999px; font-weight:600;
+  }
+  .pay-received{background:var(--green-bg);color:var(--green);}
+  .pay-pending{background:var(--amber-bg);color:#a05a00;}
+  .guest-count-pill{
+    background:var(--gray-bg); color:var(--text-2); font-size:11.5px;
+    padding:3px 9px; border-radius:999px; font-weight:600;
+  }
+  .chevron{transition:transform .15s ease; color:var(--text-3); font-size:14px;}
+  .chevron.open{transform:rotate(90deg);}
 
-  .sponsor-body { padding: 20px; }
-  .section-label { font-size: 10px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: .05em; margin: 20px 0 10px; }
+  .sponsor-body{padding:0 18px 18px;}
 
-  .benefits-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 8px;
-  }
-  .benefit-row {
-    display: flex; align-items: center; gap: 10px; padding: 10px 12px;
-    border-radius: 8px; background: var(--bg); font-size: 12px; cursor: pointer;
-    border: 1px solid var(--border); justify-content: space-between;
-    transition: border-color 0.2s;
-  }
-  .benefit-row:hover { border-color: var(--border-strong); }
-  .benefit-row.done { background: var(--green-bg); border-color: rgba(16, 185, 129, 0.2); }
-  .benefit-row .check {
-    width: 16px; height: 16px; border-radius: 4px; border: 1px solid var(--border);
-    flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--bg);
-    font-size: 10px; color: #fff;
-  }
-  .benefit-row.done .check { background: var(--green); border-color: var(--green); }
-  .benefit-row.done span.txt { color: var(--green); font-weight: 600; }
-  .benefit-row .left { display: flex; align-items: center; gap: 10px; min-width: 0; }
-  .benefit-row .left span.txt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .status-tag { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 99px; text-transform: uppercase; }
-  .status-tag.done { background: var(--green); color: var(--bg); }
-  .status-tag.pending { background: var(--border); color: var(--text-2); }
-
-  .benefit-progress { font-size: 11px; color: var(--text-2); margin-top: 12px; }
-  .progress-track { height: 6px; background: var(--bg); border-radius: 99px; margin-top: 6px; overflow: hidden; border: 1px solid var(--border); }
-  .progress-fill { height: 100%; background: var(--green); border-radius: 99px; }
-
-  .add-sponsor-toggle {
-    display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 8px;
-    background: var(--text); color: var(--bg); font-size: 13px; font-weight: 750; cursor: pointer; border: none; margin-bottom: 20px;
-    transition: opacity 0.2s;
-  }
-  .add-sponsor-toggle:hover { opacity: 0.9; }
-  
-  .add-sponsor-form {
-    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 20px; margin-bottom: 20px; display: none;
-  }
-  .add-sponsor-form.open { display: block; }
-  .add-sponsor-form .row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
-  .add-sponsor-form input, .add-sponsor-form select {
-    background: var(--bg); border: 1px solid var(--border); color: var(--text);
-    padding: 10px 12px; border-radius: 8px; font-size: 13px; flex: 1; min-width: 160px; outline: none;
-  }
-  .add-sponsor-form button {
-    padding: 10px 20px; border: none; border-radius: 8px; background: var(--text); color: var(--bg);
-    font-size: 13px; font-weight: 700; cursor: pointer;
+  .section-label{
+    font-size:11.5px; font-weight:700; color:var(--text-3); text-transform:uppercase;
+    letter-spacing:.5px; margin:16px 0 8px;
   }
 
-  table.guest-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
-  table.guest-table th {
-    text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: .05em;
-    color: var(--text-3); padding: 8px 10px; border-bottom: 1px solid var(--border); font-weight: 700;
+  .benefits-grid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+    gap:6px;
   }
-  table.guest-table td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-  table.guest-table tr:last-child td { border-bottom: none; }
-  td[contenteditable=true] { border-radius: 6px; padding: 4px 8px !important; transition: background 0.2s; }
-  td[contenteditable=true]:hover { background: rgba(255, 255, 255, 0.05); }
-  td[contenteditable=true]:focus { outline: 1px solid var(--border-strong); background: var(--bg); }
-  .del-guest { color: var(--text-3); cursor: pointer; font-size: 14px; }
-  .del-guest:hover { color: var(--red); }
+  .benefit-row{
+    display:flex; align-items:center; gap:8px; padding:6px 8px;
+    border-radius:7px; background:var(--gray-bg); font-size:12.5px; cursor:pointer;
+    border:1px solid transparent; justify-content:space-between;
+  }
+  .benefit-row:hover{border-color:var(--border-strong);}
+  .benefit-row.done{background:var(--green-bg);}
+  .benefit-row .check{
+    width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border-strong);
+    flex-shrink:0; display:flex; align-items:center; justify-content:center; background:#fff;
+    font-size:11px; color:#fff;
+  }
+  .benefit-row.done .check{background:var(--green);border-color:var(--green);}
+  .benefit-row.done span.txt{color:#1a5c37;}
+  .benefit-row .detail{color:var(--text-3);font-weight:500;}
+  .benefit-row .left{display:flex;align-items:center;gap:8px;min-width:0;}
+  .benefit-row .left span.txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .status-tag{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:99px;flex-shrink:0;margin-left:8px;}
+  .status-tag.done{background:var(--green);color:#fff;}
+  .status-tag.pending{background:#e7e2da;color:#7a6f5f;}
 
-  select.status-select {
-    font-size: 11px; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border);
-    font-weight: 700; cursor: pointer; background: var(--bg); color: var(--text);
+  .add-sponsor-toggle{
+    display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:8px;
+    background:var(--navy);color:#fff;font-size:13px;font-weight:600;cursor:pointer;border:none;margin-bottom:16px;
   }
-  .status-Confirmed { background: var(--green-bg) !important; color: var(--green) !important; border-color: rgba(16, 185, 129, 0.2) !important; }
-  .status-Pending { background: var(--amber-bg) !important; color: var(--amber) !important; border-color: rgba(245, 158, 11, 0.2) !important; }
-  .status-Not { background: var(--red-bg) !important; color: var(--red) !important; border-color: rgba(239, 68, 68, 0.2) !important; }
-
-  .gp-toggle {
-    display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
-    padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; border: 1px solid var(--border);
-    user-select: none;
+  .add-sponsor-toggle:hover{background:var(--navy-2);}
+  .add-sponsor-form{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:14px 16px;margin-bottom:16px;display:none;
   }
-  .gp-yes { background: var(--green-bg); color: var(--green); border-color: rgba(16, 185, 129, 0.2); }
-  .gp-no { background: var(--bg); color: var(--text-3); }
-
-  .no-guests { color: var(--text-3); font-size: 12px; padding: 12px 0; font-style: italic; }
-
-  .add-guest-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
-  .add-guest-row input {
-    background: var(--bg); border: 1px solid var(--border); color: var(--text);
-    padding: 8px 12px; border-radius: 8px; font-size: 12px; flex: 1; min-width: 120px; outline: none;
+  .add-sponsor-form.open{display:block;}
+  .add-sponsor-form .row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+  .add-sponsor-form input, .add-sponsor-form select{
+    padding:8px 10px;border:1px solid var(--border-strong);border-radius:6px;font-size:12.5px;flex:1;min-width:140px;
   }
-  .add-guest-row button {
-    padding: 8px 16px; border: none; border-radius: 8px; background: var(--text); color: var(--bg);
-    font-size: 12px; font-weight: 700; cursor: pointer;
-  }
-
-  .section-divider { display: flex; align-items: center; gap: 12px; margin: 36px 0 20px; }
-  .section-divider-line { flex: 1; height: 1px; background: var(--border); }
-  .section-divider-text { font-size: 13px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .05em; }
-
-  .cubicle-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 16px; margin-bottom: 24px;
-  }
-  .cubicle {
-    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;
-    display: flex; flex-col justify-content: space-between; flex-direction: column;
-  }
-  .cubicle-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
-  .cubicle-title { font-size: 14px; font-weight: 700; color: var(--text); }
-  .cubicle-count { font-size: 26px; font-weight: 800; color: var(--text); }
-  .cubicle-sub { font-size: 11px; color: var(--text-3); margin-bottom: 12px; }
-  .cubicle-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; min-height: 24px; }
-  .cubicle-chip {
-    display: inline-flex; align-items: center; gap: 6px; background: var(--bg); border: 1px solid var(--border);
-    padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; color: var(--text-2);
-  }
-  .cubicle-chip .rm { cursor: pointer; color: var(--text-3); font-weight: 700; }
-  .cubicle-chip .rm:hover { color: var(--red); }
-  .cubicle-add { display: flex; gap: 6px; }
-  .cubicle-add input {
-    flex: 1; padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 12px;
-    background: var(--bg); color: var(--text); outline: none;
-  }
-  .cubicle-add button {
-    padding: 7px 14px; border: none; border-radius: 8px; background: var(--text); color: var(--bg);
-    font-size: 12px; font-weight: 700; cursor: pointer;
+  .add-sponsor-form button{
+    padding:8px 16px;border:none;border-radius:6px;background:var(--navy);color:#fff;
+    font-size:12.5px;font-weight:600;cursor:pointer;
   }
 
-  .team-search {
-    width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px;
-    font-size: 13px; margin-bottom: 12px; background: var(--card); color: var(--text); outline: none;
-  }
-  .team-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 8px; max-height: 400px; overflow-y: auto; padding-right: 4px;
-  }
-  .team-row {
-    display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px;
-    background: var(--card); border: 1px solid var(--border); font-size: 12.5px; cursor: pointer;
-    transition: all 0.2s;
-  }
-  .team-row:hover { border-color: var(--border-strong); }
-  .team-row.done { background: var(--green-bg); border-color: rgba(16, 185, 129, 0.2); }
-  .team-row .check {
-    width: 16px; height: 16px; border-radius: 4px; border: 1px solid var(--border);
-    flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--bg);
-    font-size: 10px; color: #fff;
-  }
-  .team-row.done .check { background: var(--green); border-color: var(--green); }
-  .team-row .tnum { color: var(--text-2); font-weight: 700; font-mono: monospace; font-size: 11px; flex-shrink: 0; }
-  .team-row .tname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-2); }
-  .team-row.done .tname { color: var(--green); font-weight: 600; }
+  td[contenteditable=true]{cursor:text;border-radius:4px;}
+  td[contenteditable=true]:hover{background:var(--gray-bg);}
+  td[contenteditable=true]:focus{outline:1.5px solid var(--navy);background:#fff;}
+  .del-guest{color:var(--text-3);cursor:pointer;font-size:15px;padding:0 4px;}
+  .del-guest:hover{color:var(--red);}
 
-  .save-indicator {
-    position: fixed; bottom: 20px; right: 20px; background: var(--text); color: var(--bg);
-    font-size: 12px; font-weight: 750; padding: 10px 18px; border-radius: 8px; opacity: 0; transition: opacity .3s;
-    pointer-events: none; z-index: 50; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  .benefit-progress{
+    font-size:12px; color:var(--text-2); margin-top:8px;
   }
-  .save-indicator.show { opacity: 1; }
+  .progress-track{
+    height:5px;background:var(--gray-bg);border-radius:99px;margin-top:4px;overflow:hidden;
+  }
+  .progress-fill{height:100%;background:var(--green);border-radius:99px;}
 
-  .footer-note { text-align: center; color: var(--text-3); font-size: 11px; margin-top: 48px; }
+  table.guest-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px;}
+  table.guest-table th{
+    text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.4px;
+    color:var(--text-3); padding:6px 8px; border-bottom:1px solid var(--border); font-weight:600;
+  }
+  table.guest-table td{padding:8px; border-bottom:1px solid var(--border); vertical-align:middle;}
+  table.guest-table tr:last-child td{border-bottom:none;}
+  .guest-name{font-weight:600;}
+  .guest-sub{color:var(--text-3);font-size:11.5px;}
+
+  select.status-select{
+    font-size:12px; padding:5px 8px; border-radius:6px; border:1px solid var(--border-strong);
+    font-weight:600; cursor:pointer;
+  }
+  .status-Confirmed{background:var(--green-bg);color:var(--green);border-color:#bfe3cd;}
+  .status-Pending{background:var(--amber-bg);color:#a05a00;border-color:#f2d9a3;}
+  .status-Not{background:var(--red-bg);color:#a3221f;border-color:#f2c1bf;}
+
+  .gp-toggle{
+    display:inline-flex; align-items:center; gap:6px; cursor:pointer;
+    padding:5px 10px; border-radius:6px; font-size:12px; font-weight:600; border:1px solid var(--border-strong);
+    user-select:none;
+  }
+  .gp-yes{background:var(--green-bg);color:var(--green);border-color:#bfe3cd;}
+  .gp-no{background:var(--gray-bg);color:var(--text-2);}
+
+  .no-guests{color:var(--text-3);font-size:12.5px;padding:10px 0;font-style:italic;}
+
+  .add-guest-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+  .add-guest-row input{
+    padding:7px 9px;border:1px solid var(--border-strong);border-radius:6px;font-size:12.5px;flex:1;min-width:110px;
+  }
+  .add-guest-row button{
+    padding:7px 14px;border:none;border-radius:6px;background:var(--navy);color:#fff;
+    font-size:12.5px;font-weight:600;cursor:pointer;
+  }
+  .add-guest-row button:hover{background:var(--navy-2);}
+
+  .footer-note{
+    text-align:center;color:var(--text-3);font-size:11.5px;margin-top:24px;
+  }
+
+  .section-divider{display:flex;align-items:center;gap:12px;margin:32px 0 14px;}
+  .section-divider-line{flex:1;height:1px;background:var(--border-strong);}
+  .section-divider-text{font-size:14px;font-weight:700;color:var(--navy);white-space:nowrap;}
+
+  .cubicle-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:14px;margin-bottom:22px;
+  }
+  .cubicle{
+    background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;
+  }
+  .cubicle-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px;}
+  .cubicle-title{font-size:13.5px;font-weight:700;color:var(--text);}
+  .cubicle-count{font-size:24px;font-weight:700;color:var(--navy);}
+  .cubicle-sub{font-size:11.5px;color:var(--text-3);margin-bottom:10px;}
+  .cubicle-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;min-height:20px;}
+  .cubicle-chip{
+    display:inline-flex;align-items:center;gap:6px;background:var(--gray-bg);
+    padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;color:var(--text-2);
+  }
+  .cubicle-chip .rm{cursor:pointer;color:var(--text-3);font-weight:700;}
+  .cubicle-chip .rm:hover{color:var(--red);}
+  .cubicle-add{display:flex;gap:6px;}
+  .cubicle-add input{
+    flex:1;padding:7px 9px;border:1px solid var(--border-strong);border-radius:6px;font-size:12.5px;
+  }
+  .cubicle-add button{
+    padding:7px 12px;border:none;border-radius:6px;background:var(--navy);color:#fff;
+    font-size:12.5px;font-weight:600;cursor:pointer;
+  }
+  .cubicle-add button:hover{background:var(--navy-2);}
+
+  .team-search{
+    width:100%;padding:8px 10px;border:1px solid var(--border-strong);border-radius:7px;
+    font-size:12.5px;margin-bottom:8px;
+  }
+  .team-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+    gap:6px;max-height:420px;overflow-y:auto;padding-right:4px;
+  }
+  .team-row{
+    display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:7px;
+    background:var(--gray-bg);font-size:12.5px;cursor:pointer;border:1px solid transparent;
+  }
+  .team-row:hover{border-color:var(--border-strong);}
+  .team-row.done{background:var(--green-bg);}
+  .team-row .check{
+    width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border-strong);
+    flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#fff;
+    font-size:11px;color:#fff;
+  }
+  .team-row.done .check{background:var(--green);border-color:var(--green);}
+  .team-row .tnum{color:var(--text-3);font-weight:600;flex-shrink:0;}
+  .team-row .tname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .team-row.done .tname{color:#1a5c37;}
+  .save-indicator{
+    position:fixed; bottom:16px; right:16px; background:var(--navy); color:#fff;
+    font-size:12px; padding:8px 14px; border-radius:8px; opacity:0; transition:opacity .3s;
+    pointer-events:none; z-index:50;
+  }
+  .save-indicator.show{opacity:1;}
+
   @media(max-width:640px){
-    .sponsor-meta { width: 100%; justify-content: space-between; }
-    table.guest-table { font-size: 11px; }
+    .sponsor-meta{width:100%;justify-content:space-between;}
+    table.guest-table{font-size:12px;}
   }
 </style>
 </head>
@@ -340,11 +301,9 @@
 
 <div class="topbar">
   <div class="topbar-inner">
-    <div>
-      <h1>SUPRA SAEINDIA 2026 — Guest & Sponsor Benefit Tracker</h1>
-      <div class="sub">2–5 September 2026 · Buddh International Circuit, Greater Noida</div>
-    </div>
-    <div class="sub" id="syncIndicator" style="font-weight:700;">Connecting...</div>
+    <h1>SUPRA SAEINDIA 2026 — Guest & Sponsor Benefit Tracker</h1>
+    <div class="sub">2–5 September 2026 · Buddh International Circuit, Greater Noida</div>
+    <div class="sub" id="syncIndicator" style="margin-top:4px;font-weight:600;">Connecting...</div>
   </div>
 </div>
 <div class="stripe"></div>
@@ -412,7 +371,7 @@
     <div class="section-divider-text">Vehicle Sticker Placement Tracker</div>
     <div class="section-divider-line"></div>
   </div>
-  <div style="color:var(--text-2);font-size:12px;margin-bottom:14px;">
+  <div style="color:var(--text-2);font-size:12.5px;margin-bottom:14px;">
     Which companies' stickers have been placed on which teams' cars — one checklist of all 61 competing teams per sponsor.
   </div>
 
@@ -432,13 +391,13 @@
     <div class="section-divider-text">Team Vehicle Sticker Status (all companies combined)</div>
     <div class="section-divider-line"></div>
   </div>
-  <div style="color:var(--text-2);font-size:12px;margin-bottom:10px;">
+  <div style="color:var(--text-2);font-size:12.5px;margin-bottom:10px;">
     All 61 competing teams — one quick overall yes/no per car, separate from the per-sponsor checklists above.
   </div>
   <input type="text" class="team-search" id="teamStickerSearch" placeholder="Search team name or number...">
   <div class="team-grid" id="teamStickerList" style="max-height:600px;"></div>
 
-  <div class="footer-note" id="footerNote">Saved automatically to database</div>
+  <div class="footer-note" id="footerNote">Data saved automatically to database</div>
 </div>
 
 <div class="save-indicator" id="saveIndicator">Saved</div>
@@ -455,6 +414,74 @@ const TIER_BENEFITS = {
   Other: ["Lunch/refreshments for officials","Logo on website/event site/valedictory","Promotional activities onsite","Materials in student kits","Participation in HR meet"],
   General: []
 };
+
+const SPONSORS_SEED = [
+  {name:"MSIL", tier:"Principal", amount:3000000, paymentStatus:"Payment Received", nonMonetary:"-"},
+  {name:"Envision India", tier:"Other", tierLabel:"EV Zone Sponsor", amount:700000, paymentStatus:"Payment Received", nonMonetary:"Showcase F1 vehicle"},
+  {name:"BPCL", tier:"Gold", tierLabel:"Gold Sponsor", amount:700000, paymentStatus:"Pending", nonMonetary:"-"},
+  {name:"Dassault Systems", tier:"Silver", amount:500000, paymentStatus:"Pending", nonMonetary:"-"},
+  {name:"Munjal Kiriu", tier:"Silver", amount:500000, paymentStatus:"Pending", nonMonetary:"-"},
+  {name:"ICAT", tier:"Silver", amount:500000, paymentStatus:"Payment Received", nonMonetary:"-"},
+  {name:"JK Tyre", tier:"Silver", amount:500000, paymentStatus:"Pending", nonMonetary:"-"},
+  {name:"Ansys", tier:"Bronze", amount:300000, paymentStatus:"Pending", nonMonetary:"-"},
+  {name:"AVL", tier:"Bronze", amount:300000, paymentStatus:"Pending", nonMonetary:"-"},
+  {name:"CEAT", tier:"Bronze", amount:300000, paymentStatus:"Payment Received", nonMonetary:"-"},
+  {name:"MRF", tier:"Bronze", amount:300000, paymentStatus:"Pending", nonMonetary:"-"},
+  {name:"Validate", tier:"Bronze", amount:300000, paymentStatus:"Pending", nonMonetary:"-"},
+  {name:"APOLLO", tier:"Bronze", amount:300000, paymentStatus:"Pending", nonMonetary:"-"},
+  {name:"ETAS", tier:"Bronze", amount:250000, paymentStatus:"Pending", nonMonetary:"-"},
+  {name:"Migatronic", tier:"Bronze", tierLabel:"Bronze · Hot Pit Partner", amount:200000, paymentStatus:"Pending", nonMonetary:"Hot Pit Partner"},
+  {name:"EKA Mobility", tier:"Other", tierLabel:"Customised Sponsor", amount:100000, paymentStatus:"Pending", nonMonetary:"-"},
+  {name:"KIET", tier:"Other", tierLabel:"Host Partner", amount:0, paymentStatus:"-", nonMonetary:"Hostel facility for volunteers"},
+  {name:"Morphine Motorsports", tier:"Other", tierLabel:"Kit Partner", amount:0, paymentStatus:"-", nonMonetary:"SUPRA kits"},
+  {name:"ETAuto", tier:"Other", tierLabel:"Media Partner", amount:0, paymentStatus:"-", nonMonetary:"Media coverage"},
+  {name:"AutoCar", tier:"Other", tierLabel:"Media Partner", amount:0, paymentStatus:"-", nonMonetary:"Media coverage"},
+  {name:"EV Tech News", tier:"Other", tierLabel:"Media Partner", amount:0, paymentStatus:"-", nonMonetary:"Media coverage"},
+  {name:"ARAI", tier:"Other", tierLabel:"Supporting Partner", amount:0, paymentStatus:"-", nonMonetary:"Support"},
+  {name:"ACMA", tier:"Other", tierLabel:"Supporting Partner", amount:0, paymentStatus:"-", nonMonetary:"Support"},
+  {name:"General Guests", tier:"General", tierLabel:"Not sponsoring", amount:0, paymentStatus:"-", nonMonetary:"-"}
+];
+
+const GUESTS_SEED = [
+  {sponsor:"AutoCar", name:"Mukul", designation:"-", contact:"98736 43293", email:"mukul.kumar@autocarindia.com", date:"Need to check"},
+  {sponsor:"AutoCar", name:"Kiran", designation:"-", contact:"97464 11023", email:"kiran.murali@autocarindia.com", date:"Need to check"},
+  {sponsor:"ETAuto", name:"Ms. Arushi Rawat", designation:"Principal Correspondent", contact:"96542 29841", email:"arushi.rawat@timesinternet.in", date:"Need to check"},
+  {sponsor:"ETAuto", name:"Himanshu Rautela", designation:"Camera Person", contact:"-", email:"himanshu.rautela@timesinternet.in", date:"Need to check"},
+  {sponsor:"ETAuto", name:"Sudeep Kumar", designation:"-", contact:"-", email:"sudeep.kumar@timesinternet.in", date:"Need to check — few more will join with him"},
+  {sponsor:"Ansys", name:"Mayank Dwivedi", designation:"Senior App. Engineer, Synopsys", contact:"63669 49284", email:"m.dwivedi@synopsys.com", date:"2–5 Sep (need to check)"},
+  {sponsor:"Ansys", name:"Rohit Sangwan", designation:"Senior App. Engineer, Synopsys", contact:"89204 79290", email:"rohit.sangwan@arkinfo.in", date:"2–5 Sep (need to check)"},
+  {sponsor:"Ansys", name:"Arindam Pal", designation:"Application Engineer, CADFEM", contact:"80932 80021", email:"arindam.p@cadfem.ai", date:"2–5 Sep (need to check)"},
+  {sponsor:"Ansys", name:"Vishal Ganore", designation:"Academic Program Manager, Synopsys", contact:"80077 29958", email:"Not provided", date:"2–5 Sep (need to check)"},
+  {sponsor:"Ansys", name:"Arup Tyagi", designation:"Sr. Manager – Academic Programs, ASEAN, Synopsys", contact:"96501 33552", email:"aroop@synopsys.com", date:"5 Sep"},
+  {sponsor:"Validate", name:"Amit Kumar Mehta", designation:"Director Technical", contact:"99109 96179", email:"amitkumar.mehta@validateindia.com", date:"5 Sep"},
+  {sponsor:"Validate", name:"Irshad Ahmad", designation:"Manager", contact:"99993 26820", email:"irshad.ahmad@validateindia.com", date:"2–5 Sep (need to check)"},
+  {sponsor:"Validate", name:"Srishti Sharma", designation:"-", contact:"92117 48800", email:"sharshtee.sharma@validateindia.com", date:"2–5 Sep (need to check)"},
+  {sponsor:"ACMA", name:"Shardool Singh", designation:"Regional Secretary – North", contact:"Not provided", email:"shardool.singh@acma.in", date:"3 Sep"},
+  {sponsor:"ACMA", name:"Mayank Nigam", designation:"Dy. Director", contact:"97111 59124", email:"mayank.nigam@acma.in", date:"3 Sep"},
+  {sponsor:"ACMA", name:"Jairaj Kumar", designation:"Asst. Director", contact:"98734 79790", email:"jairaj.kumar@acma.in", date:"3 Sep"},
+  {sponsor:"ACMA", name:"Hemant Kumar", designation:"Executive Officer", contact:"88607 91948", email:"hemant.kumar@acma.in", date:"3 Sep"},
+  {sponsor:"Munjal Kiriu", name:"Ashish Jindal", designation:"AVP", contact:"99711 49417", email:"ajindal@munjalkiriu.co.in", date:"2–5 Sep (need to check)"},
+  {sponsor:"Munjal Kiriu", name:"Virender Singh Thakur", designation:"GM", contact:"98103 59859", email:"vsthakur@munjalkiriu.co.in", date:"2–5 Sep (need to check)"},
+  {sponsor:"Munjal Kiriu", name:"Soutan Patra", designation:"AM", contact:"95470 45057", email:"marketing@munjalkiriu.co.in", date:"2–5 Sep (need to check)"},
+  {sponsor:"Morphine Motorsports", name:"Azmat Hussain", designation:"Founder and Director", contact:"84607 06779", email:"director@gomorphine.com", date:"31 Aug – 5 Sep"},
+  {sponsor:"Morphine Motorsports", name:"Yash Agrawal", designation:"Co-founder and Director", contact:"90219 83311", email:"mms@gomorphine.com", date:"31 Aug – 5 Sep"},
+  {sponsor:"Morphine Motorsports", name:"Ritanshu Vishwakarma", designation:"Operations Manager", contact:"93593 34153", email:"vishwakarmaritanshu@gmail.com", date:"31 Aug – 5 Sep"},
+  {sponsor:"BPCL", name:"Amol Bhosale", designation:"-", contact:"-", email:"amolb@bharatpetroleum.in", date:"9 May 2026 (as entered — please confirm)"},
+  {sponsor:"BPCL", name:"Mukherjee Sourav", designation:"-", contact:"-", email:"souravm@bharatpetroleum.in", date:"9 May 2026 (as entered — please confirm)"},
+  {sponsor:"BPCL", name:"Pardeep Goyal", designation:"Business Head (Retail)", contact:"-", email:"pardeepg@bharatpetroleum.in", date:"Need to check"},
+  {sponsor:"BPCL", name:"Gorav", designation:"CGM, Marketing (Retail)", contact:"-", email:"gorav@bharatpetroleum.in", date:"Need to check"},
+  {sponsor:"BPCL", name:"Charu Yadav", designation:"Head, Customer Experience (Retail)", contact:"-", email:"yadavc@bharatpetroleum.in", date:"Need to check"},
+  {sponsor:"BPCL", name:"Sameet Pai", designation:"CGM Finance (Retail)", contact:"-", email:"sameetpai@bharatpetroleum.in", date:"Need to check"},
+  {sponsor:"BPCL", name:"Achman Trehan", designation:"Head Retail North", contact:"-", email:"trehanaah@bharatpetroleum.in", date:"Need to check"},
+  {sponsor:"BPCL", name:"Amol Bhosale (State Head)", designation:"State Head (Retail), UP West & Uttarakhand", contact:"-", email:"amolb@bharatpetroleum.in", date:"Need to check"},
+  {sponsor:"Migatronic", name:"Thomas Mathew", designation:"AGM – Automation & Application", contact:"81309 12380", email:"thomas@migatronic.in", date:"1–5 Sep 2026", vehiclePass:"UP-14GQ 7621"},
+  {sponsor:"Migatronic", name:"Harsh Vardhan Jain", designation:"Head – Automation & Application", contact:"99719 98257", email:"hvjain@migatronic.in", date:"2–5 Sep 2026", vehiclePass:"UP-14GH 1713"},
+  {sponsor:"Migatronic", name:"Sameer Ansari", designation:"Sr. Service Engineer", contact:"70117 24899", email:"sameer@migatronic.in", date:"1–5 Sep 2026"},
+  {sponsor:"Migatronic", name:"Dharmender", designation:"Service Engineer", contact:"90271 55676", email:"dharmender@migatronic.in", date:"1–5 Sep 2026"},
+  {sponsor:"Migatronic", name:"Harsh Vardhan Tyagi", designation:"GM – North", contact:"99719 98258", email:"harsh@migatronic.in", date:"9 May 2026 (as entered — please confirm)"},
+  {sponsor:"Migatronic", name:"Varun Mukhi", designation:"RM – North & East", contact:"99719 98260", email:"varun@migatronic.in", date:"9 May 2026 (as entered — please confirm)"},
+  {sponsor:"Migatronic", name:"Manu Gulati", designation:"CEO, Migatronic India", contact:"99719 98256", email:"manu@migatronic.in", date:"9 May 2026 (as entered — please confirm)", vehiclePass:"DL-10 CX 5698"}
+];
 
 const TEAMS_SEED = [
   {num:"EV-01", name:"Amrita Racing"},
@@ -520,9 +547,18 @@ const TEAMS_SEED = [
   {num:"ICV-59", name:"Velocita Racing"}
 ];
 
+const STICKER_SPONSORS_SEED = [
+  {name:"MSIL", size:"Large (15x15cm)"},
+  {name:"BPCL", size:"Medium (12x10cm)"},
+  {name:"Dassault Systems", size:"7x7cm"},
+  {name:"Munjal Kiriu", size:"7x7cm"},
+  {name:"ICAT", size:"7x7cm"},
+  {name:"JK Tyre", size:"7x7cm"}
+];
+
 let state = {
-  guestStatus: {},   // key: sponsor|name -> {confirmed:"Pending", gatePass:false}
-  benefitDone: {},   // key: sponsor|benefitIndex -> true
+  guestStatus: {},   
+  benefitDone: {},   
   extraGuests: [],   
   extraSponsors: [], 
   guestEdits: {},    
@@ -533,9 +569,12 @@ let state = {
   extraStickerSponsors: [] 
 };
 
-// Auto-Sync variables
+// Supabase synchronization variables
 let supabase = null;
 let useSupabase = false;
+let hasLoadedSupabaseData = false;
+
+// Apps Script variables fallback
 let SYNC_URL = "";
 let SYNC_KEY = "";
 
@@ -553,7 +592,7 @@ async function initSupabase() {
       setupLegacyAppsScript();
     }
   } catch (e) {
-    console.error("Config API failed, fallback to local settings", e);
+    console.error("Config API failed, fallback to Apps Script", e);
     setupLegacyAppsScript();
   }
 }
@@ -561,92 +600,98 @@ async function initSupabase() {
 function setupLegacyAppsScript() {
   SYNC_URL = "https://script.google.com/macros/s/AKfycbyXemMpMUjtSLiNNuZ6YcdiohuAq_vrZtZZSTmYz2HeaTS0faXHOw9NkVxA7JupLqK_-w/exec";
   SYNC_KEY = "ZtNTtjutFoszxt7OxpMF";
-  setSyncStatus("Syncing via Google Apps Script", true);
-  document.getElementById("footerNote").textContent = "Data saved automatically to Apps Script / Google Sheets";
+  setSyncStatus("Synced", true);
+  document.getElementById("footerNote").textContent = "Data saved automatically to Google Sheets via Apps Script";
   loadState();
 }
 
 async function loadFromSupabase() {
   try {
-    // 1. Fetch Sponsors & merge into state
     const { data: dbSponsors } = await supabase.from("sponsors").select("*").is("deleted_at", null);
-    // 2. Fetch Guests
     const { data: dbGuests } = await supabase.from("guests").select("*, sponsors(sponsor_name)").is("deleted_at", null);
-    // 3. Fetch Benefits
-    const { data: dbBenefits } = await supabase.from("sponsor_benefits").select("*, sponsors(sponsor_name)").is("deleted_at", null);
-    // 4. Fetch Cubicles (Fulfillment)
+    const { data: dbBenefits } = await supabase.from("sponsor_benefits").select("*, sponsors(sponsor_name, sponsor_tier)").is("deleted_at", null);
     const { data: dbFulfillment } = await supabase.from("fulfillment_items").select("*");
-    // 5. Fetch Stickers
     const { data: dbStickerCompanies } = await supabase.from("sticker_companies").select("*");
     const { data: dbStickerPlacements } = await supabase.from("sticker_placements").select("*, sticker_companies(company_name)");
     const { data: dbTeamStickerStatus } = await supabase.from("team_sticker_status").select("*");
 
-    // Map sponsors
-    state.extraSponsors = (dbSponsors || []).map(sp => ({
-      id: sp.id,
-      name: sp.sponsor_name,
-      tier: sp.sponsor_tier.charAt(0).toUpperCase() + sp.sponsor_tier.slice(1).toLowerCase(),
-      tierLabel: sp.sponsor_tier_label || undefined,
-      amount: parseFloat(sp.sponsorship_amount) || 0,
-      paymentStatus: sp.payment_status,
-      nonMonetary: sp.notes || "-"
-    }));
+    if (dbSponsors && dbSponsors.length > 0) {
+      state.extraSponsors = dbSponsors.map(sp => ({
+        id: sp.id,
+        name: sp.sponsor_name,
+        tier: sp.sponsor_tier.charAt(0).toUpperCase() + sp.sponsor_tier.slice(1).toLowerCase(),
+        tierLabel: sp.sponsor_tier_label || undefined,
+        amount: parseFloat(sp.sponsorship_amount) || 0,
+        paymentStatus: sp.payment_status,
+        nonMonetary: sp.notes || "-"
+      }));
+    }
 
-    // Map guests
-    state.extraGuests = (dbGuests || []).map(g => {
-      const spName = g.sponsors ? g.sponsors.sponsor_name : "General Guests";
-      const key = spName + "|||" + g.guest_name;
-      state.guestStatus[key] = {
-        confirmed: g.attendance_status === "attended" ? "Confirmed" : (g.attendance_status === "declined" ? "Not" : "Pending"),
-        gatePass: g.gatepass_status === "issued" || g.gatepass_status === "scanned"
-      };
-      return {
-        id: g.id,
-        sponsor: spName,
-        name: g.guest_name,
-        designation: g.designation || "-",
-        contact: g.phone || "-",
-        email: g.email || "-",
-        date: g.remarks || "-"
-      };
-    });
+    if (dbGuests && dbGuests.length > 0) {
+      state.extraGuests = dbGuests.map(g => {
+        const spName = g.sponsors ? g.sponsors.sponsor_name : "General Guests";
+        const key = spName + "|||" + g.guest_name;
+        state.guestStatus[key] = {
+          confirmed: g.attendance_status === "attended" ? "Confirmed" : (g.attendance_status === "declined" ? "Not" : "Pending"),
+          gatePass: g.gatepass_status === "issued" || g.gatepass_status === "scanned"
+        };
+        return {
+          id: g.id,
+          sponsor: spName,
+          name: g.guest_name,
+          designation: g.designation || "-",
+          contact: g.phone || "-",
+          email: g.email || "-",
+          date: g.remarks || "-"
+        };
+      });
+    }
 
-    // Map benefits
-    (dbBenefits || []).forEach(b => {
-      const spName = b.sponsors ? b.sponsors.sponsor_name : "";
-      const benefits = TIER_BENEFITS[b.sponsors?.sponsor_tier] || [];
-      const idx = benefits.indexOf(b.benefit_name);
-      if (idx !== -1 && spName) {
-        state.benefitDone[spName + "|||" + idx] = b.status === "completed";
-      }
-    });
+    if (dbBenefits && dbBenefits.length > 0) {
+      dbBenefits.forEach(b => {
+        const spName = b.sponsors ? b.sponsors.sponsor_name : "";
+        const tier = b.sponsors ? (b.sponsors.sponsor_tier.charAt(0).toUpperCase() + b.sponsors.sponsor_tier.slice(1).toLowerCase()) : "";
+        const benefits = TIER_BENEFITS[tier] || [];
+        const idx = benefits.indexOf(b.benefit_name);
+        if (idx !== -1 && spName) {
+          state.benefitDone[spName + "|||" + idx] = b.status === "completed";
+        }
+      });
+    }
 
-    // Map fulfillment cubicles
-    state.cubicles = { stall: [], stickers: [], kits: [] };
-    (dbFulfillment || []).forEach(item => {
-      if (state.cubicles[item.category]) {
-        state.cubicles[item.category].push(item.company_name);
-      }
-    });
+    if (dbFulfillment && dbFulfillment.length > 0) {
+      state.cubicles = { stall: [], stickers: [], kits: [] };
+      dbFulfillment.forEach(item => {
+        if (state.cubicles[item.category]) {
+          state.cubicles[item.category].push(item.company_name);
+        }
+      });
+    }
 
-    // Map sticker tracker
-    state.extraStickerSponsors = (dbStickerCompanies || []).map(sc => ({
-      id: sc.id,
-      name: sc.company_name,
-      size: sc.sticker_size || ""
-    }));
+    if (dbStickerCompanies && dbStickerCompanies.length > 0) {
+      state.extraStickerSponsors = dbStickerCompanies.map(sc => ({
+        id: sc.id,
+        name: sc.company_name,
+        size: sc.sticker_size || ""
+      }));
+    }
 
-    (dbStickerPlacements || []).forEach(sp => {
-      const spName = sp.sticker_companies?.company_name || "";
-      if (spName) {
-        state.stickerDone[spName + "|||" + sp.team_number] = sp.is_placed;
-      }
-    });
+    if (dbStickerPlacements && dbStickerPlacements.length > 0) {
+      dbStickerPlacements.forEach(sp => {
+        const spName = sp.sticker_companies?.company_name || "";
+        if (spName) {
+          state.stickerDone[spName + "|||" + sp.team_number] = sp.is_placed;
+        }
+      });
+    }
 
-    (dbTeamStickerStatus || []).forEach(ts => {
-      state.teamStickerStatus[ts.team_number] = ts.is_placed;
-    });
+    if (dbTeamStickerStatus && dbTeamStickerStatus.length > 0) {
+      dbTeamStickerStatus.forEach(ts => {
+        state.teamStickerStatus[ts.team_number] = ts.is_placed;
+      });
+    }
 
+    hasLoadedSupabaseData = true;
     render();
   } catch (err) {
     console.error("Error loading from Supabase:", err);
@@ -786,12 +831,40 @@ function saveState() {
   });
 }
 
+function guestKey(sponsor,name){ return sponsor+"|||"+name; }
+
+function getGuestStatus(sponsor,name){
+  const k = guestKey(sponsor,name);
+  if(!state.guestStatus[k]) state.guestStatus[k] = {confirmed:"Pending", gatePass:false};
+  return state.guestStatus[k];
+}
+
 function allGuests() {
-  return state.extraGuests;
+  if (useSupabase && hasLoadedSupabaseData) {
+    return state.extraGuests;
+  }
+  const base = GUESTS_SEED
+    .filter(g=> !state.hiddenGuests.includes(g.sponsor+"|||"+g.name))
+    .map(g=>{
+      const editKey = g.sponsor+"|||"+g.name;
+      const edit = state.guestEdits[editKey];
+      return edit ? Object.assign({}, g, edit, {_origName:g.name}) : Object.assign({}, g, {_origName:g.name});
+    });
+  return base.concat(state.extraGuests.map(g=>Object.assign({}, g, {_origName:g.name, _fromExtra:true})));
 }
 
 function allSponsors() {
-  return state.extraSponsors;
+  if (useSupabase && hasLoadedSupabaseData) {
+    return state.extraSponsors;
+  }
+  return SPONSORS_SEED.concat(state.extraSponsors);
+}
+
+function allStickerSponsors() {
+  if (useSupabase && hasLoadedSupabaseData) {
+    return state.extraStickerSponsors;
+  }
+  return STICKER_SPONSORS_SEED.concat(state.extraStickerSponsors);
 }
 
 // ---------- FILTER STATE ----------
@@ -801,7 +874,7 @@ let tierFilterVal = "";
 let openSponsors = new Set();
 
 function matchesFilter(sponsor, g) {
-  const st = state.guestStatus[sponsor + "|||" + g.name] || {confirmed: "Pending"};
+  const st = getGuestStatus(sponsor, g.name);
   if (activeFilter === "Confirmed") return st.confirmed === "Confirmed";
   if (activeFilter === "Pending") return st.confirmed === "Pending";
   if (activeFilter === "Not") return st.confirmed === "Not";
@@ -820,7 +893,7 @@ function computeStats() {
   const guests = allGuests();
   let confirmed = 0, pending = 0, not = 0, gpYes = 0, gpNo = 0;
   guests.forEach(g => {
-    const st = state.guestStatus[g.sponsor + "|||" + g.name] || {confirmed: "Pending"};
+    const st = getGuestStatus(g.sponsor, g._origName);
     if (st.confirmed === "Confirmed") confirmed++;
     else if (st.confirmed === "Not") not++;
     else pending++;
@@ -833,7 +906,7 @@ function renderStats() {
   const s = computeStats();
   const hero = document.getElementById('heroStat');
   hero.innerHTML = `
-    <div class="icon">👥</div>
+    <div class="icon">&#128101;</div>
     <div>
       <div class="num">${s.total}</div>
       <div class="lbl">Total guests across all sponsors (${s.sponsors} sponsors)</div>
@@ -841,13 +914,13 @@ function renderStats() {
   `;
   const el = document.getElementById('stats');
   el.innerHTML = `
-    <div class="stat"><div class="num">${s.total}</div><div class="lbl">Total guests</div></div>
+    <div class="stat accent-navy"><div class="num">${s.total}</div><div class="lbl">Total guests</div></div>
     <div class="stat accent-green"><div class="num">${s.confirmed}</div><div class="lbl">Confirmed coming</div></div>
     <div class="stat accent-amber"><div class="num">${s.pending}</div><div class="lbl">Pending confirmation</div></div>
     <div class="stat accent-red"><div class="num">${s.not}</div><div class="lbl">Not coming</div></div>
     <div class="stat accent-green"><div class="num">${s.gpYes}</div><div class="lbl">Gate pass issued</div></div>
     <div class="stat accent-amber"><div class="num">${s.gpNo}</div><div class="lbl">Gate pass pending</div></div>
-    <div class="stat"><div class="num">${s.sponsors}</div><div class="lbl">Total sponsors</div></div>
+    <div class="stat accent-navy"><div class="num">${s.sponsors}</div><div class="lbl">Total sponsors</div></div>
   `;
 }
 
@@ -860,6 +933,18 @@ function populateTierFilter() {
     opt.value = t; opt.textContent = t;
     sel.appendChild(opt);
   });
+}
+
+function benefitRow(sponsorName, tier, benefit, idx) {
+  const key = sponsorName + "|||" + idx;
+  const done = !!state.benefitDone[key];
+  return `<div class="benefit-row ${done ? 'done' : ''}" data-benefit-key="${key}" data-benefit-tier="${tier}">
+    <div class="left">
+      <div class="check">${done ? '&#10003;' : ''}</div>
+      <span class="txt">${benefit}</span>
+    </div>
+    <span class="status-tag ${done ? 'done' : 'pending'}">${done ? 'Done' : 'Not done'}</span>
+  </div>`;
 }
 
 function renderSponsorCard(sp) {
@@ -887,39 +972,43 @@ function renderSponsorCard(sp) {
       <th>Guest (edit inline)</th><th>Designation</th><th>Contact</th><th>Email</th><th>Expected date</th><th>Confirmation</th><th>Gate pass</th><th></th>
     </tr></thead><tbody>`;
     visibleGuests.forEach(g => {
-      const st = state.guestStatus[sp.name + "|||" + g.name] || {confirmed: "Pending", gatePass: false};
+      const st = getGuestStatus(sp.name, g._origName);
       guestRows += `<tr>
-        <td contenteditable="true" data-edit-sponsor="${sp.name}" data-edit-orig="${g.name}" data-edit-field="guest_name">${g.name}</td>
-        <td contenteditable="true" data-edit-sponsor="${sp.name}" data-edit-orig="${g.name}" data-edit-field="designation">${g.designation || ''}</td>
-        <td contenteditable="true" data-edit-sponsor="${sp.name}" data-edit-orig="${g.name}" data-edit-field="phone">${g.contact || ''}</td>
-        <td contenteditable="true" data-edit-sponsor="${sp.name}" data-edit-orig="${g.name}" data-edit-field="email">${g.email || ''}</td>
-        <td contenteditable="true" data-edit-sponsor="${sp.name}" data-edit-orig="${g.name}" data-edit-field="remarks">${g.date || ''}</td>
+        <td contenteditable="true" data-edit-sponsor="${sp.name}" data-edit-orig="${g._origName}" data-edit-field="guest_name">${g.name}</td>
+        <td contenteditable="true" data-edit-sponsor="${sp.name}" data-edit-orig="${g._origName}" data-edit-field="designation">${g.designation || ''}</td>
+        <td contenteditable="true" data-edit-sponsor="${sp.name}" data-edit-orig="${g._origName}" data-edit-field="phone">${g.contact || ''}</td>
+        <td contenteditable="true" data-edit-sponsor="${sp.name}" data-edit-orig="${g._origName}" data-edit-field="email">${g.email || ''}</td>
+        <td contenteditable="true" data-edit-sponsor="${sp.name}" data-edit-orig="${g._origName}" data-edit-field="remarks">${g.date || ''}</td>
         <td>
-          <select class="status-select status-${st.confirmed}" data-guest-sponsor="${sp.name}" data-guest-name="${g.name}" data-action="confirm">
+          <select class="status-select status-${st.confirmed}" data-guest-sponsor="${sp.name}" data-guest-name="${g._origName}" data-action="confirm">
             <option value="Pending" ${st.confirmed === 'Pending' ? 'selected' : ''}>Pending</option>
             <option value="Confirmed" ${st.confirmed === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
             <option value="Not" ${st.confirmed === 'Not' ? 'selected' : ''}>Not coming</option>
           </select>
         </td>
         <td>
-          <div class="gp-toggle ${st.gatePass ? 'gp-yes' : 'gp-no'}" data-guest-sponsor="${sp.name}" data-guest-name="${g.name}" data-action="gatepass">
+          <div class="gp-toggle ${st.gatePass ? 'gp-yes' : 'gp-no'}" data-guest-sponsor="${sp.name}" data-guest-name="${g._origName}" data-action="gatepass">
             ${st.gatePass ? '&#10003; Issued' : 'Not issued'}
           </div>
         </td>
-        <td><span class="del-guest" data-del-sponsor="${sp.name}" data-del-name="${g.name}">&times;</span></td>
+        <td><span class="del-guest" data-del-sponsor="${sp.name}" data-del-name="${g._origName}">&times;</span></td>
       </tr>`;
     });
     guestRows += `</tbody></table>`;
   }
 
+  const tierClass = "tier-" + sp.tier;
+  const tierLabel = sp.tierLabel || sp.tier;
+  const amountLabel = sp.amount ? "&#8377;" + sp.amount.toLocaleString('en-IN') : "Non-monetary";
+
   return `
   <div class="sponsor-card">
     <div class="sponsor-head ${isOpen ? 'open' : ''}" data-toggle="${sp.name}">
       <span class="chevron ${isOpen ? 'open' : ''}">&#9656;</span>
-      <span class="tier-badge tier-${sp.tier}">${sp.tierLabel || sp.tier}</span>
+      <span class="tier-badge ${tierClass}">${tierLabel}</span>
       <span class="sponsor-name">${sp.name}</span>
       <div class="sponsor-meta">
-        <span class="amount">${sp.amount ? "&#8377;" + sp.amount.toLocaleString('en-IN') : "Non-monetary"}</span>
+        <span class="amount">${amountLabel}</span>
         ${sp.paymentStatus && sp.paymentStatus !== "-" ? `<span class="pay-pill ${payClass}">${sp.paymentStatus}</span>` : ''}
         <span class="guest-count-pill">${guests.length} guest${guests.length !== 1 ? 's' : ''}</span>
         ${benefits.length > 0 ? `<span class="guest-count-pill">${doneCount}/${benefits.length} benefits done</span>` : ''}
@@ -927,25 +1016,16 @@ function renderSponsorCard(sp) {
     </div>
     <div class="sponsor-body" style="display:${isOpen ? 'block' : 'none'}">
       ${benefits.length > 0 ? `
-      <div class="section-label">Entitled benefits (${sp.tierLabel || sp.tier} tier) — click to mark delivered</div>
+      <div class="section-label">Entitled benefits (${tierLabel} tier) — click to mark delivered</div>
       <div class="benefits-grid">
-        ${benefits.map((b, idx) => {
-          const key = sp.name + "|||" + idx;
-          const done = !!state.benefitDone[key];
-          return `<div class="benefit-row ${done ? 'done' : ''}" data-benefit-key="${key}" data-benefit-tier="${sp.tier}">
-            <div class="left">
-              <div class="check">${done ? '&#10003;' : ''}</div>
-              <span class="txt">${b}</span>
-            </div>
-            <span class="status-tag ${done ? 'done' : 'pending'}">${done ? 'Done' : 'Not done'}</span>
-          </div>`;
-        }).join('')}
+        ${benefits.map((b, idx) => benefitRow(sp.name, sp.tier, b, idx)).join('')}
       </div>
       <div class="benefit-progress">
-        {doneCount} of {benefits.length} benefits delivered
+        ${doneCount} of ${benefits.length} benefits delivered
         <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
       </div>
       ` : `<div class="no-guests" style="padding-top:6px;">No sponsor benefits apply.</div>`}
+      ${sp.nonMonetary && sp.nonMonetary !== "-" ? `<div class="section-label">Non-monetary support</div><div style="font-size:12.5px;color:var(--text-2);">${sp.nonMonetary}</div>` : ''}
 
       <div class="section-label">Guest list</div>
       ${guestRows}
@@ -976,13 +1056,9 @@ function render() {
   attachHandlers();
 }
 
-// ---------- VEHICLE STICKER TRACKER ----------
+// ---------- PER-SPONSOR VEHICLE STICKER TRACKER ----------
 let openStickerSponsors = new Set();
 let stickerSearch = {};
-
-function allStickerSponsors() {
-  return state.extraStickerSponsors;
-}
 
 function renderStickerSection() {
   const container = document.getElementById('stickerList');
@@ -1191,7 +1267,7 @@ function attachHandlers() {
     el.addEventListener('change', async () => {
       const sponsor = el.getAttribute('data-guest-sponsor');
       const name = el.getAttribute('data-guest-name');
-      const st = state.guestStatus[sponsor + "|||" + name] || {confirmed: "Pending"};
+      const st = getGuestStatus(sponsor, name);
       st.confirmed = el.value;
       if (useSupabase) {
         await syncToSupabase("confirm-guest", { name, status: el.value });
@@ -1206,7 +1282,7 @@ function attachHandlers() {
     el.addEventListener('click', async () => {
       const sponsor = el.getAttribute('data-guest-sponsor');
       const name = el.getAttribute('data-guest-name');
-      const st = state.guestStatus[sponsor + "|||" + name] || {confirmed: "Pending", gatePass: false};
+      const st = getGuestStatus(sponsor, name);
       st.gatePass = !st.gatePass;
       if (useSupabase) {
         await syncToSupabase("gatepass-guest", { name, gatePass: st.gatePass });
@@ -1340,13 +1416,6 @@ document.getElementById('ss-submit').addEventListener('click', async () => {
   openStickerSponsors.add(name);
   renderStickerSection();
 });
-
-function setSyncStatus(text, ok) {
-  const ind = document.getElementById('syncIndicator');
-  if (!ind) return;
-  ind.textContent = text;
-  ind.style.color = ok ? '#10b981' : '#ef4444';
-}
 
 document.getElementById('search').addEventListener('input', (e) => {
   searchTerm = e.target.value;
