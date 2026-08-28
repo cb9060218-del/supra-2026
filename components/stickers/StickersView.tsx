@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { ChevronDown, ChevronRight, Check, Search, Plus, ShieldAlert } from "lucide-react";
+import { ChevronDown, ChevronRight, Check, Search, Plus, ShieldAlert, Trash2 } from "lucide-react";
 
 interface Team {
   num: string;
@@ -56,6 +56,23 @@ export default function StickersView({
   const [isPending, startTransition] = useTransition();
   const isWritable = ["super_admin", "admin", "coordinator"].includes(userRole);
   const supabase = createClient();
+
+  const handleDeleteCompany = async (id: string, name: string) => {
+    if (
+      !confirm(
+        `Are you sure you want to delete ${name} from the sticker placement tracker? This will remove all its checklists.`
+      )
+    )
+      return;
+
+    startTransition(async () => {
+      const { error } = await supabase.from("sticker_companies").delete().eq("id", id);
+      if (!error) {
+        setCompanies((prev) => prev.filter((c) => c.id !== id));
+        setPlacements((prev) => prev.filter((p) => p.company_id !== id));
+      }
+    });
+  };
 
   const toggleExpand = (id: string) => {
     setExpandedCompanies((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -255,6 +272,19 @@ export default function StickersView({
                   <span className="hidden sm:inline-block text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800/80 px-2 py-0.5 rounded text-zinc-600 dark:text-zinc-400">
                     {pct}% done
                   </span>
+                  {isWritable && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteCompany(company.id, company.company_name);
+                      }}
+                      className="text-zinc-400 hover:text-red-500 p-1.5 rounded transition-all focus:outline-none"
+                      title="Delete company"
+                      disabled={isPending}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
                 </div>
               </div>
 
