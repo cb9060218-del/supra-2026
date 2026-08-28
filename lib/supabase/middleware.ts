@@ -6,6 +6,13 @@ export async function updateSession(request: NextRequest) {
     request,
   });
 
+  const path = request.nextUrl.pathname;
+
+  // ONLY run session checks if the route is a dashboard route!
+  if (!path.startsWith("/dashboard")) {
+    return supabaseResponse;
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -40,8 +47,6 @@ export async function updateSession(request: NextRequest) {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-
-    const path = request.nextUrl.pathname;
 
     // Protect dashboard routes
     if (path.startsWith("/dashboard")) {
