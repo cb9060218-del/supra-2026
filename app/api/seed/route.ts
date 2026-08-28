@@ -142,6 +142,29 @@ const GUESTS_SEED = [
   { sponsor_id: 'a0e0a0e0-a0e0-4a0e-a0e0-000000000015', guest_name: 'Manu Gulati', designation: 'CEO, Migatronic India', email: 'manu@migatronic.in', phone: '99719 98256', remarks: '9 May 2026 (as entered — please confirm)', attendance_status: 'pending' }
 ];
 
+const CUBICLES_SEED = [
+  { category: "stall", company_name: "envision gold stall" },
+  { category: "stall", company_name: "BPCL" },
+  { category: "stall", company_name: "MORPHINE" },
+  { category: "stall", company_name: "MEGATRONIC" },
+  { category: "stickers", company_name: "MSIL 15*15" },
+  { category: "stickers", company_name: "BPCL 12*10" },
+  { category: "stickers", company_name: "DASSAULT 7*7" },
+  { category: "stickers", company_name: "MUNJAL 7*7" },
+  { category: "stickers", company_name: "ICAT 7*7" },
+  { category: "stickers", company_name: "JK TYERS 7*7" }
+];
+
+const TIER_BENEFITS: Record<string, string[]> = {
+  principal: ["Stall setup 18x3 mtr","Event branding in company name","Student engagement (webinars/training)","Official seat at valedictory","Non-track branding — 25 spots","Branding on student vehicles (large)","Database of participating teams","Lunch/refreshments for officials","Logo on website/event site/valedictory","Promotional activities onsite","Materials in student kits","Award cheque & trophy branding","Customized branding options","Participation in HR meet"],
+  platinum: ["Stall setup 9x3 mtr","Student engagement (webinars/training)","Official seat at valedictory","Non-track branding — 15 spots","Branding on student vehicles (medium)","Database of participating teams","Lunch/refreshments for officials","Logo on website/event site/valedictory","Promotional activities onsite","Materials in student kits","Award cheque & trophy branding","Customized branding options","Participation in HR meet"],
+  gold: ["Stall setup 6x3 mtr","Student engagement (webinars/training)","Non-track branding — 15 spots","Branding on student vehicles (medium)","Database of participating teams","Lunch/refreshments for officials","Logo on website/event site/valedictory","Promotional activities onsite","Materials in student kits","Award cheque & trophy branding","Customized branding options","Participation in HR meet"],
+  lunch: ["Stall setup 4x3 mtr","Student engagement (webinars/training)","Non-track branding — 10 spots","Branding on student vehicles (7x7cm)","Database of participating teams","Lunch/refreshments for officials","Logo on website/event site/valedictory","Promotional activities onsite","Materials in student kits","Award cheque & trophy branding","Customized branding options","Participation in HR meet"],
+  silver: ["Stall setup 3x3 mtr","Student engagement (webinars/training)","Non-track branding — 10 spots","Branding on student vehicles (7x7cm)","Database of participating teams","Lunch/refreshments for officials","Logo on website/event site/valedictory","Promotional activities onsite","Materials in student kits","Award cheque & trophy branding","Customized branding options","Participation in HR meet"],
+  bronze: ["Non-track branding — 5 spots","Lunch/refreshments for officials","Logo on website/event site/valedictory","Promotional activities onsite","Materials in student kits","Award cheque & trophy branding","Customized branding options","Participation in HR meet"],
+  other: ["Lunch/refreshments for officials","Logo on website/event site/valedictory","Promotional activities onsite","Materials in student kits","Participation in HR meet"]
+};
+
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
 
@@ -151,9 +174,11 @@ export async function GET(request: NextRequest) {
   if (reset) {
     console.log("Forcing database reset...");
     await supabase.from("guests").delete().neq("guest_name", "FORCE_DELETE_ALL");
+    await supabase.from("sponsor_benefits").delete().neq("benefit_name", "FORCE_DELETE_ALL");
     await supabase.from("sponsors").delete().neq("sponsor_name", "FORCE_DELETE_ALL");
     await supabase.from("teams").delete().neq("name", "FORCE_DELETE_ALL");
     await supabase.from("sticker_companies").delete().neq("company_name", "FORCE_DELETE_ALL");
+    await supabase.from("fulfillment_items").delete().neq("company_name", "FORCE_DELETE_ALL");
   }
 
   // 1. Seed sponsors if empty
@@ -193,6 +218,45 @@ export async function GET(request: NextRequest) {
     await supabase.from("sticker_companies").insert(STICKER_SPONSORS_SEED);
   }
 
+  // 5. Seed fulfillment items if empty
+  const { count: fulfillmentCount } = await supabase
+    .from("fulfillment_items")
+    .select("id", { count: "exact", head: true });
+
+  if (!fulfillmentCount || fulfillmentCount === 0) {
+    await supabase.from("fulfillment_items").insert(CUBICLES_SEED);
+  }
+
+  // 6. Seed sponsor benefits if empty
+  const { count: benefitsCount } = await supabase
+    .from("sponsor_benefits")
+    .select("id", { count: "exact", head: true });
+
+  if (!benefitsCount || benefitsCount === 0) {
+    const { data: fetchedSponsors } = await supabase
+      .from("sponsors")
+      .select("id, sponsor_tier");
+
+    if (fetchedSponsors) {
+      const benefitsToInsert: any[] = [];
+      fetchedSponsors.forEach((sp) => {
+        const tier = (sp.sponsor_tier || "other").toLowerCase();
+        const list = TIER_BENEFITS[tier] || TIER_BENEFITS.other;
+        list.forEach((b) => {
+          benefitsToInsert.push({
+            sponsor_id: sp.id,
+            benefit_name: b,
+            status: "pending"
+          });
+        });
+      });
+
+      if (benefitsToInsert.length > 0) {
+        await supabase.from("sponsor_benefits").insert(benefitsToInsert);
+      }
+    }
+  }
+
   return NextResponse.json({
     status: "success",
     message: "Database seeded successfully",
@@ -200,7 +264,9 @@ export async function GET(request: NextRequest) {
       sponsors: sponsorsCount,
       guests: guestsCount,
       teams: teamsCount,
-      sticker_companies: stickerCount
+      sticker_companies: stickerCount,
+      fulfillment_items: fulfillmentCount,
+      sponsor_benefits: benefitsCount
     }
   });
 }
