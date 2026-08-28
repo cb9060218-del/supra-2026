@@ -85,6 +85,18 @@ export default function StickersView({
       (p) => p.company_id === companyId && p.team_number === teamNumber
     );
     const nextVal = current ? !current.is_placed : true;
+    const prevVal = current ? current.is_placed : false;
+
+    setPlacements((prev) => {
+      const exists = prev.some((p) => p.company_id === companyId && p.team_number === teamNumber);
+      if (exists) {
+        return prev.map((p) =>
+          p.company_id === companyId && p.team_number === teamNumber ? { ...p, is_placed: nextVal } : p
+        );
+      } else {
+        return [...prev, { company_id: companyId, team_number: teamNumber, is_placed: nextVal }];
+      }
+    });
 
     startTransition(async () => {
       const { error } = await supabase.from("sticker_placements").upsert(
@@ -96,17 +108,13 @@ export default function StickersView({
         { onConflict: "company_id, team_number" }
       );
 
-      if (!error) {
-        setPlacements((prev) => {
-          const exists = prev.some((p) => p.company_id === companyId && p.team_number === teamNumber);
-          if (exists) {
-            return prev.map((p) =>
-              p.company_id === companyId && p.team_number === teamNumber ? { ...p, is_placed: nextVal } : p
-            );
-          } else {
-            return [...prev, { company_id: companyId, team_number: teamNumber, is_placed: nextVal }];
-          }
-        });
+      if (error) {
+        setPlacements((prev) =>
+          prev.map((p) =>
+            p.company_id === companyId && p.team_number === teamNumber ? { ...p, is_placed: prevVal } : p
+          )
+        );
+        alert("Failed to update sticker placement: " + error.message);
       }
     });
   };
@@ -116,6 +124,16 @@ export default function StickersView({
 
     const current = overallStatus.find((o) => o.team_number === teamNumber);
     const nextVal = current ? !current.is_placed : true;
+    const prevVal = current ? current.is_placed : false;
+
+    setOverallStatus((prev) => {
+      const exists = prev.some((o) => o.team_number === teamNumber);
+      if (exists) {
+        return prev.map((o) => (o.team_number === teamNumber ? { ...o, is_placed: nextVal } : o));
+      } else {
+        return [...prev, { team_number: teamNumber, is_placed: nextVal }];
+      }
+    });
 
     startTransition(async () => {
       const { error } = await supabase.from("team_sticker_status").upsert(
@@ -126,15 +144,11 @@ export default function StickersView({
         { onConflict: "team_number" }
       );
 
-      if (!error) {
-        setOverallStatus((prev) => {
-          const exists = prev.some((o) => o.team_number === teamNumber);
-          if (exists) {
-            return prev.map((o) => (o.team_number === teamNumber ? { ...o, is_placed: nextVal } : o));
-          } else {
-            return [...prev, { team_number: teamNumber, is_placed: nextVal }];
-          }
-        });
+      if (error) {
+        setOverallStatus((prev) =>
+          prev.map((o) => (o.team_number === teamNumber ? { ...o, is_placed: prevVal } : o))
+        );
+        alert("Failed to update overall status: " + error.message);
       }
     });
   };
@@ -142,21 +156,36 @@ export default function StickersView({
   const handleAddCompany = async () => {
     if (!newCompanyName.trim()) return;
 
+    const tempId = "temp-" + Date.now();
+    const tempCompany = {
+      id: tempId,
+      company_name: newCompanyName.trim(),
+      sticker_size: newStickerSize.trim() || null,
+      created_at: new Date().toISOString()
+    };
+
+    setCompanies((prev) => [...prev, tempCompany]);
+    setNewCompanyName("");
+    setNewStickerSize("");
+    setShowAddForm(false);
+
     startTransition(async () => {
       const { data, error } = await supabase
         .from("sticker_companies")
         .insert({
-          company_name: newCompanyName.trim(),
-          sticker_size: newStickerSize.trim() || null,
+          company_name: tempCompany.company_name,
+          sticker_size: tempCompany.sticker_size,
         })
         .select()
         .single();
 
-      if (!error && data) {
-        setCompanies((prev) => [...prev, data]);
-        setNewCompanyName("");
-        setNewStickerSize("");
-        setShowAddForm(false);
+      if (error || !data) {
+        setCompanies((prev) => prev.filter((c) => c.id !== tempId));
+        alert("Failed to add company: " + (error?.message || "Unknown error"));
+      } else {
+        setCompanies((prev) =>
+          prev.map((c) => (c.id === tempId ? data : c))
+        );
       }
     });
   };
