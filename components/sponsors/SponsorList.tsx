@@ -118,11 +118,18 @@ export default function SponsorList({
   const isWritable = ["super_admin", "admin", "coordinator"].includes(userRole);
 
   const handlePaymentStatusChange = (sponsorId: string, value: string) => {
+    const prevPayment = sponsors.find(s => s.id === sponsorId)?.payment_status || "-";
+    setSponsors((prev) =>
+      prev.map((s) => (s.id === sponsorId ? { ...s, payment_status: value } : s))
+    );
     startTransition(async () => {
-      await updateSponsorPaymentStatusAction(sponsorId, value, `Updated payment status to ${value}`);
-      setSponsors((prev) =>
-        prev.map((s) => (s.id === sponsorId ? { ...s, payment_status: value } : s))
-      );
+      const res = await updateSponsorPaymentStatusAction(sponsorId, value, `Updated payment status to ${value}`);
+      if (res?.error) {
+        setSponsors((prev) =>
+          prev.map((s) => (s.id === sponsorId ? { ...s, payment_status: prevPayment } : s))
+        );
+        alert("Failed to update payment status: " + res.error);
+      }
     });
   };
 
@@ -130,10 +137,23 @@ export default function SponsorList({
     const name = newBenefitName[sponsorId]?.trim();
     if (!name) return;
 
+    const tempId = "temp-" + Date.now();
+    const newBenefitObj: Benefit = {
+      id: tempId,
+      sponsor_id: sponsorId,
+      benefit_name: name,
+      status: "pending",
+    };
+
+    setBenefits((prev) => [...prev, newBenefitObj]);
+    setNewBenefitName((prev) => ({ ...prev, [sponsorId]: "" }));
+
     startTransition(async () => {
       const res = await createBenefitAction(sponsorId, name, `Added benefit: ${name}`);
-      if (!res.error) {
-        setNewBenefitName((prev) => ({ ...prev, [sponsorId]: "" }));
+      if (res?.error) {
+        setBenefits((prev) => prev.filter((b) => b.id !== tempId));
+        alert("Failed to add benefit: " + res.error);
+      } else {
         router.refresh();
       }
     });
@@ -246,74 +266,127 @@ export default function SponsorList({
     const name = newGuestName[sponsorId]?.trim();
     if (!name) return;
 
+    const tempId = "temp-" + Date.now();
+    const gDesig = newGuestDesig[sponsorId]?.trim() || "";
+    const gPhone = newGuestPhone[sponsorId]?.trim() || "";
+    const gEmail = newGuestEmail[sponsorId]?.trim() || "";
+    const gDate = newGuestDate[sponsorId]?.trim() || "";
+
+    const tempGuest: Guest = {
+      id: tempId,
+      guest_name: name,
+      sponsor_id: sponsorId,
+      designation: gDesig,
+      email: gEmail,
+      phone: gPhone,
+      remarks: gDate,
+      attendance_status: "Pending",
+      gatepass_status: "not_issued",
+      guest_role: "sponsor",
+    };
+
+    setGuests((p) => [...p, tempGuest]);
+
+    setNewGuestName((p) => ({ ...p, [sponsorId]: "" }));
+    setNewGuestDesig((p) => ({ ...p, [sponsorId]: "" }));
+    setNewGuestPhone((p) => ({ ...p, [sponsorId]: "" }));
+    setNewGuestEmail((p) => ({ ...p, [sponsorId]: "" }));
+    setNewGuestDate((p) => ({ ...p, [sponsorId]: "" }));
+
     startTransition(async () => {
       const res = await createGuestAction({
         sponsor_id: sponsorId,
         guest_name: name,
-        designation: newGuestDesig[sponsorId]?.trim() || "",
+        designation: gDesig,
         company: sponsorName,
-        email: newGuestEmail[sponsorId]?.trim() || "",
-        phone: newGuestPhone[sponsorId]?.trim() || "",
-        remarks: newGuestDate[sponsorId]?.trim() || "",
+        email: gEmail,
+        phone: gPhone,
+        remarks: gDate,
         attendance_status: "Pending",
         guest_role: "sponsor",
         accommodation_required: false,
         change_reason: `Added guest: ${name} directly under ${sponsorName}`,
       });
 
-      if (!res.error) {
-        setNewGuestName((p) => ({ ...p, [sponsorId]: "" }));
-        setNewGuestDesig((p) => ({ ...p, [sponsorId]: "" }));
-        setNewGuestPhone((p) => ({ ...p, [sponsorId]: "" }));
-        setNewGuestEmail((p) => ({ ...p, [sponsorId]: "" }));
-        setNewGuestDate((p) => ({ ...p, [sponsorId]: "" }));
+      if (res?.error) {
+        setGuests((prev) => prev.filter((g) => g.id !== tempId));
+        alert("Failed to add guest: " + res.error);
+      } else {
         router.refresh();
       }
     });
   };
 
   const handleInlineEdit = (guestId: string, field: string, value: string) => {
+    let guestField = "";
+    if (field === "name") guestField = "guest_name";
+    else if (field === "designation") guestField = "designation";
+    else if (field === "contact") guestField = "phone";
+    else if (field === "email") guestField = "email";
+    else if (field === "date") guestField = "remarks";
+
+    if (!guestField) return;
+
+    const prevValue = guests.find((g) => g.id === guestId)?.[guestField as keyof Guest] || "";
+
+    setGuests((prev) =>
+      prev.map((g) => (g.id === guestId ? { ...g, [guestField]: value } : g))
+    );
+
     startTransition(async () => {
-      await updateGuestFieldInlineAction(
+      const res = await updateGuestFieldInlineAction(
         guestId,
         field,
         value,
         `Inline edited guest ${field} value`
       );
+      if (res?.error) {
+        setGuests((prev) =>
+          prev.map((g) => (g.id === guestId ? { ...g, [guestField]: prevValue } : g))
+        );
+        alert("Failed to save: " + res.error);
+      }
     });
   };
 
   const handleRSVPChange = (guestId: string, value: string) => {
+    const prevRSVP = guests.find(g => g.id === guestId)?.attendance_status || "Pending";
+    setGuests((prev) =>
+      prev.map((g) => (g.id === guestId ? { ...g, attendance_status: value } : g))
+    );
     startTransition(async () => {
-      await updateGuestFieldInlineAction(
+      const res = await updateGuestFieldInlineAction(
         guestId,
         "attendance_status",
         value,
         `Updated RSVP status to ${value}`
       );
-      setGuests((prev) =>
-        prev.map((g) => (g.id === guestId ? { ...g, attendance_status: value } : g))
-      );
+      if (res?.error) {
+        setGuests((prev) =>
+          prev.map((g) => (g.id === guestId ? { ...g, attendance_status: prevRSVP } : g))
+        );
+        alert("Failed to update RSVP: " + res.error);
+      }
     });
   };
 
   const handleToggleGatepass = (guestId: string, currentStatus: string) => {
+    const nextStatus = currentStatus === "issued" || currentStatus === "scanned" ? "not_issued" : "issued";
+    setGuests((prev) =>
+      prev.map((g) => (g.id === guestId ? { ...g, gatepass_status: nextStatus } : g))
+    );
     startTransition(async () => {
-      await toggleGuestGatepassAction(
+      const res = await toggleGuestGatepassAction(
         guestId,
         currentStatus,
         `Toggled gatepass ticket status`
       );
-      setGuests((prev) =>
-        prev.map((g) =>
-          g.id === guestId
-            ? {
-                ...g,
-                gatepass_status: currentStatus === "issued" || currentStatus === "scanned" ? "not_issued" : "issued",
-              }
-            : g
-        )
-      );
+      if (res?.error) {
+        setGuests((prev) =>
+          prev.map((g) => (g.id === guestId ? { ...g, gatepass_status: currentStatus } : g))
+        );
+        alert("Failed to update gatepass: " + res.error);
+      }
     });
   };
 
@@ -330,6 +403,9 @@ export default function SponsorList({
   const handleToggleBenefit = (benefitId: string, sponsorId: string, currentStatus: string) => {
     if (!isWritable) return;
     const nextStatus = currentStatus === "completed" ? "pending" : "completed";
+    setBenefits((prev) =>
+      prev.map((b) => (b.id === benefitId ? { ...b, status: nextStatus } : b))
+    );
     startTransition(async () => {
       const res = await updateBenefitStatusAction(
         benefitId,
@@ -338,10 +414,11 @@ export default function SponsorList({
         "",
         "Toggled benefit completion"
       );
-      if (!res.error) {
+      if (res?.error) {
         setBenefits((prev) =>
-          prev.map((b) => (b.id === benefitId ? { ...b, status: nextStatus } : b))
+          prev.map((b) => (b.id === benefitId ? { ...b, status: currentStatus } : b))
         );
+        alert("Failed to update benefit status: " + res.error);
       }
     });
   };
