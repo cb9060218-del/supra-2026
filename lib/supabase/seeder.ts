@@ -1,13 +1,26 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 
 export async function seedDatabase(supabase: SupabaseClient) {
-  // Check if sponsors table is empty
+  // Check count and verify if MSIL is present
   const { count } = await supabase
     .from("sponsors")
     .select("id", { count: "exact", head: true });
 
-  if (count === 0) {
-    console.log("Seeding default sponsors...");
+  const { data: msil } = await supabase
+    .from("sponsors")
+    .select("id")
+    .eq("sponsor_name", "MSIL")
+    .maybeSingle();
+
+  // If the database has dirty or incomplete data, force re-seed to get the exact data
+  if (count !== 24 || !msil) {
+    console.log("Database has dirty/incomplete sponsors count. Resetting and seeding exact data...");
+    
+    // Clear existing to avoid primary/foreign key constraint conflicts
+    await supabase.from("guests").delete().neq("guest_name", "FORCE_DELETE_ALL");
+    await supabase.from("sponsors").delete().neq("sponsor_name", "FORCE_DELETE_ALL");
+
+    // 1. Seed the exact 24 sponsors
     const sponsorsSeed = [
       { id: 'a0e0a0e0-a0e0-4a0e-a0e0-000000000001', sponsor_name: 'MSIL', sponsor_tier: 'principal', sponsorship_amount: 3000000, payment_status: 'Payment Received', notes: '-' },
       { id: 'a0e0a0e0-a0e0-4a0e-a0e0-000000000002', sponsor_name: 'Envision India', sponsor_tier: 'other', sponsor_tier_label: 'EV Zone Sponsor', sponsorship_amount: 700000, payment_status: 'Payment Received', notes: 'Showcase F1 vehicle' },
@@ -31,12 +44,13 @@ export async function seedDatabase(supabase: SupabaseClient) {
       { id: 'a0e0a0e0-a0e0-4a0e-a0e0-000000000020', sponsor_name: 'AutoCar', sponsor_tier: 'other', sponsor_tier_label: 'Media Partner', sponsorship_amount: 0, payment_status: '-', notes: 'Media coverage' },
       { id: 'a0e0a0e0-a0e0-4a0e-a0e0-000000000021', sponsor_name: 'EV Tech News', sponsor_tier: 'other', sponsor_tier_label: 'Media Partner', sponsorship_amount: 0, payment_status: '-', notes: 'Media coverage' },
       { id: 'a0e0a0e0-a0e0-4a0e-a0e0-000000000022', sponsor_name: 'ARAI', sponsor_tier: 'other', sponsor_tier_label: 'Supporting Partner', sponsorship_amount: 0, payment_status: '-', notes: 'Support' },
-      { id: 'a0e0a0e0-a0e0-4a0e-a0e0-000000000023', sponsor_name: 'ACMA', sponsor_tier: 'other', sponsor_tier_label: 'Supporting Partner', sponsorship_amount: 0, payment_status: '-', notes: 'Support' }
+      { id: 'a0e0a0e0-a0e0-4a0e-a0e0-000000000023', sponsor_name: 'ACMA', sponsor_tier: 'other', sponsor_tier_label: 'Supporting Partner', sponsorship_amount: 0, payment_status: '-', notes: 'Support' },
+      { id: 'a0e0a0e0-a0e0-4a0e-a0e0-000000000024', sponsor_name: 'General Guests', sponsor_tier: 'general', sponsor_tier_label: 'Not sponsoring', sponsorship_amount: 0, payment_status: '-', notes: '-' }
     ];
 
     await supabase.from("sponsors").insert(sponsorsSeed);
 
-    console.log("Seeding default guests...");
+    // 2. Seed the exact 38 guests linked to the sponsors
     const guestsSeed = [
       { sponsor_id: 'a0e0a0e0-a0e0-4a0e-a0e0-000000000020', guest_name: 'Mukul', designation: '-', email: 'mukul.kumar@autocarindia.com', phone: '98736 43293', remarks: 'Need to check', attendance_status: 'pending' },
       { sponsor_id: 'a0e0a0e0-a0e0-4a0e-a0e0-000000000020', guest_name: 'Kiran', designation: '-', email: 'kiran.murali@autocarindia.com', phone: '97464 11023', remarks: 'Need to check', attendance_status: 'pending' },
