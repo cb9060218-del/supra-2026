@@ -98,7 +98,7 @@ const SPONSORS_SEED = [
   { id: 'a0e0a0e0-a0e0-4a0e-a0e0-000000000021', sponsor_name: 'EV Tech News', sponsor_tier: 'other', sponsor_tier_label: 'Media Partner', sponsorship_amount: 0, payment_status: '-', notes: 'Media coverage' },
   { id: 'a0e0a0e0-a0e0-4a0e-a0e0-000000000022', sponsor_name: 'ARAI', sponsor_tier: 'other', sponsor_tier_label: 'Supporting Partner', sponsorship_amount: 0, payment_status: '-', notes: 'Support' },
   { id: 'a0e0a0e0-a0e0-4a0e-a0e0-000000000023', sponsor_name: 'ACMA', sponsor_tier: 'other', sponsor_tier_label: 'Supporting Partner', sponsorship_amount: 0, payment_status: '-', notes: 'Support' },
-  { id: 'a0e0a0e0-a0e0-4a0e-a0e0-000000000024', sponsor_name: 'General Guests', sponsor_tier: 'general', sponsor_tier_label: 'Not sponsoring', sponsorship_amount: 0, payment_status: '-', notes: '-' }
+  { id: 'a0e0a0e0-a0e0-4a0e-a0e0-000000000024', sponsor_name: 'General Guests', sponsor_tier: 'other', sponsor_tier_label: 'Not sponsoring', sponsorship_amount: 0, payment_status: '-', notes: '-' }
 ];
 
 const GUESTS_SEED = [
