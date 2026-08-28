@@ -4,7 +4,6 @@ import Sidebar from "@/components/dashboard/Sidebar";
 import BottomNav from "@/components/dashboard/BottomNav";
 import NotificationCenter from "@/components/dashboard/NotificationCenter";
 import { signOutAction } from "../(auth)/actions";
-import { seedDatabase } from "@/lib/supabase/seeder";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -12,7 +11,6 @@ interface DashboardLayoutProps {
 
 export default async function DashboardLayout({ children }: DashboardLayoutProps) {
   const supabase = await createClient();
-  await seedDatabase(supabase);
   const {
     data: { user },
   } = await supabase.auth.getUser();

@@ -8,6 +8,15 @@ export async function updateSession(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
 
+  // Optimize Edge: Skip authentication checks for prefetch requests
+  const isPrefetch =
+    request.headers.get("x-middleware-prefetch") === "1" ||
+    request.headers.get("purpose") === "prefetch";
+
+  if (isPrefetch) {
+    return supabaseResponse;
+  }
+
   // ONLY run session checks if the route is a dashboard route!
   if (!path.startsWith("/dashboard")) {
     return supabaseResponse;
