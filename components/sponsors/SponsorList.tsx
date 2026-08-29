@@ -19,6 +19,7 @@ import {
   createBenefitAction,
   deleteBenefitAction,
   updateSponsorPaymentStatusAction,
+  deleteSponsorAction,
 } from "@/app/dashboard/sponsors/actions";
 import {
   createGuestAction,
@@ -116,6 +117,19 @@ export default function SponsorList({
   const [newBenefitName, setNewBenefitName] = useState<Record<string, string>>({});
 
   const isWritable = ["super_admin", "admin", "coordinator"].includes(userRole);
+
+  const handleDeleteSponsor = (sponsorId: string, name: string) => {
+    if (!confirm(`Are you sure you want to delete ${name}? This will remove the sponsor and its associated data.`)) return;
+
+    startTransition(async () => {
+      const res = await deleteSponsorAction(sponsorId, `Deleted sponsor: ${name}`);
+      if (res?.error) {
+        alert("Failed to delete sponsor: " + res.error);
+      } else {
+        setSponsors((prev) => prev.filter((s) => s.id !== sponsorId));
+      }
+    });
+  };
 
   const handlePaymentStatusChange = (sponsorId: string, value: string) => {
     const prevPayment = sponsors.find(s => s.id === sponsorId)?.payment_status || "-";
@@ -684,6 +698,19 @@ export default function SponsorList({
                   <span className="rounded bg-zinc-900/50 border border-zinc-850 px-2 py-0.5 text-[10px] font-semibold text-zinc-500">
                     {completedBenefits}/{spBenefits.length} benefits
                   </span>
+                  {isWritable && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteSponsor(sp.id, sp.sponsor_name);
+                      }}
+                      className="text-zinc-550 hover:text-red-550 p-1.5 rounded transition-all focus:outline-none"
+                      title="Delete Sponsor"
+                      disabled={isPending}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
                 </div>
               </div>
 
