@@ -16,23 +16,38 @@ export const EVENT_DATES: { dateKey: string; displayLabel: string; shortLabel: s
   { dateKey: "2026-09-03", displayLabel: "3 Sep 2026 (Thu)", shortLabel: "3 Sep", description: "Dynamic Events Day 1 / ACMA Visit" },
   { dateKey: "2026-09-04", displayLabel: "4 Sep 2026 (Fri)", shortLabel: "4 Sep", description: "Dynamic Events Day 2 / Autocross" },
   { dateKey: "2026-09-05", displayLabel: "5 Sep 2026 (Sat)", shortLabel: "5 Sep", description: "Endurance Race & Valedictory Ceremony" },
-  { dateKey: "2026-05-09", displayLabel: "9 May 2026", shortLabel: "9 May", description: "Early Orientation / Pre-event" },
   { dateKey: "unspecified", displayLabel: "Need to check / Pending", shortLabel: "Need to check", description: "Unconfirmed attendance dates" },
 ];
 
 /**
  * Checks if a guest is attending on a specific dateKey.
  */
-export function isGuestAttendingOnDate(guestRemarks: string | null | undefined, arrivalDate: string | null | undefined, departureDate: string | null | undefined, targetDateKey: string): boolean {
+export function isGuestAttendingOnDate(
+  guestRemarks: string | null | undefined,
+  arrivalDate: string | null | undefined,
+  departureDate: string | null | undefined,
+  targetDateKey: string
+): boolean {
   if (!targetDateKey || targetDateKey === "all") return true;
 
   const text = (guestRemarks || "").toLowerCase().trim();
 
+  const isKnownEventDate =
+    text.includes("31 aug") ||
+    text.includes("1 sep") ||
+    text.includes("1–5 sep") ||
+    text.includes("1-5 sep") ||
+    text.includes("2 sep") ||
+    text.includes("2–5 sep") ||
+    text.includes("2-5 sep") ||
+    text.includes("3 sep") ||
+    text.includes("4 sep") ||
+    text.includes("5 sep");
+
   if (targetDateKey === "unspecified") {
-    if (!text || text === "-" || text.includes("need to check") || text.includes("pending")) {
+    if (!text || text === "-" || !isKnownEventDate || text.includes("need to check") || text.includes("pending") || text.includes("9 may")) {
       return true;
     }
-    // If it doesn't match any known dates
     return false;
   }
 
@@ -41,7 +56,13 @@ export function isGuestAttendingOnDate(guestRemarks: string | null | undefined, 
   }
 
   if (targetDateKey === "2026-09-01" || targetDateKey === "1 Sep") {
-    return text.includes("1–5 sep") || text.includes("1-5 sep") || text.includes("1 sep") || text.includes("31 aug – 5 sep") || text.includes("31 aug - 5 sep");
+    return (
+      text.includes("1–5 sep") ||
+      text.includes("1-5 sep") ||
+      text.includes("1 sep") ||
+      text.includes("31 aug – 5 sep") ||
+      text.includes("31 aug - 5 sep")
+    );
   }
 
   if (targetDateKey === "2026-09-02" || targetDateKey === "2 Sep") {
@@ -94,17 +115,15 @@ export function isGuestAttendingOnDate(guestRemarks: string | null | undefined, 
     );
   }
 
-  if (targetDateKey === "2026-05-09" || targetDateKey === "9 May") {
-    return text.includes("9 may");
-  }
-
   return false;
 }
 
 /**
  * Computes exact breakdown count of guests attending on each date.
  */
-export function computeGuestDateBreakdown(guests: { remarks?: string | null; arrival_date?: string | null; departure_date?: string | null }[]): DateBreakdownItem[] {
+export function computeGuestDateBreakdown(
+  guests: { remarks?: string | null; arrival_date?: string | null; departure_date?: string | null }[]
+): DateBreakdownItem[] {
   return EVENT_DATES.map((d) => {
     const count = guests.filter((g) =>
       isGuestAttendingOnDate(g.remarks, g.arrival_date, g.departure_date, d.dateKey)
