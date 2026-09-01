@@ -42,6 +42,18 @@ export default async function SponsorsPage() {
     .select("*")
     .is("deleted_at", null);
 
+  // Retrieve sponsor media (photos/videos)
+  let media: any[] = [];
+  try {
+    const { data: mediaData } = await supabase
+      .from("sponsor_media")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (mediaData) media = mediaData;
+  } catch {
+    // Graceful fallback if table is not yet migrated in Supabase
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -55,6 +67,7 @@ export default async function SponsorsPage() {
         initialSponsors={(sponsors as any[]) || []}
         initialGuests={(guests as any[]) || []}
         initialBenefits={(benefits as any[]) || []}
+        initialMedia={media}
         userRole={userRole}
       />
     </div>

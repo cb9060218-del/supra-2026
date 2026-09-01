@@ -11,8 +11,17 @@ import {
   Check,
   Loader2,
   Lock,
+  Calendar,
+  Film,
+  Image as ImageIcon,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import {
+  computeGuestDateBreakdown,
+  isGuestAttendingOnDate,
+  DateBreakdownItem,
+} from "@/lib/dateUtils";
+import SponsorMediaGallery, { MediaItem } from "./SponsorMediaGallery";
 import {
   createSponsorAction,
   updateBenefitStatusAction,
@@ -66,6 +75,7 @@ interface SponsorListProps {
   initialSponsors: Sponsor[];
   initialGuests: Guest[];
   initialBenefits: Benefit[];
+  initialMedia?: MediaItem[];
   userRole: string;
 }
 
@@ -73,12 +83,14 @@ export default function SponsorList({
   initialSponsors,
   initialGuests,
   initialBenefits,
+  initialMedia = [],
   userRole,
 }: SponsorListProps) {
   const router = useRouter();
   const [sponsors, setSponsors] = useState<Sponsor[]>(initialSponsors);
   const [guests, setGuests] = useState<Guest[]>(initialGuests);
   const [benefits, setBenefits] = useState<Benefit[]>(initialBenefits);
+  const [media, setMedia] = useState<MediaItem[]>(initialMedia);
 
   useEffect(() => {
     setSponsors(initialSponsors);
@@ -92,9 +104,14 @@ export default function SponsorList({
     setBenefits(initialBenefits);
   }, [initialBenefits]);
 
+  useEffect(() => {
+    setMedia(initialMedia);
+  }, [initialMedia]);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [tierFilter, setTierFilter] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
+  const [selectedDateFilter, setSelectedDateFilter] = useState("all");
   const [openSponsors, setOpenSponsors] = useState<Set<string>>(new Set());
   const [isAddSponsorOpen, setIsAddSponsorOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -203,8 +220,13 @@ export default function SponsorList({
     };
   };
 
+  const dateBreakdown = computeGuestDateBreakdown(guests);
+
   const filteredGuests = guests.filter((g) => {
     const st = getGuestStatus(g);
+    const matchesDate = isGuestAttendingOnDate(g.remarks, null, null, selectedDateFilter);
+    if (!matchesDate) return false;
+
     if (activeFilter === "Confirmed") return st.confirmed === "Confirmed";
     if (activeFilter === "Pending") return st.confirmed === "Pending";
     if (activeFilter === "Not") return st.confirmed === "Not";
@@ -224,13 +246,14 @@ export default function SponsorList({
   // Search & Filter
   const finalSponsors = sponsors.filter((sp) => {
     const spGuests = getSponsorGuests(sp.id);
-    const matchesTier = !tierFilter || sp.sponsor_tier === tierFilter;
+    const spAllGuests = getSponsorAllGuests(sp.id);
+    const matchesTier = !tierFilter || sp.sponsor_tier.toLowerCase() === tierFilter.toLowerCase();
     const matchesSearch =
       !searchTerm ||
       sp.sponsor_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      spGuests.some((g) => g.guest_name.toLowerCase().includes(searchTerm.toLowerCase()));
+      spAllGuests.some((g) => g.guest_name.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    const matchesFilterState = activeFilter === "all" || spGuests.length > 0;
+    const matchesFilterState = (activeFilter === "all" && selectedDateFilter === "all") || spGuests.length > 0;
 
     return matchesTier && matchesSearch && matchesFilterState;
   });
@@ -490,6 +513,80 @@ export default function SponsorList({
         </div>
       </div>
 
+      {/* Event Dates & Guest Attendance Schedule */}
+      <div className="rounded-xl border border-zinc-900 bg-zinc-900/10 p-4 space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-amber-400" />
+            <span className="text-xs font-bold text-zinc-200 uppercase tracking-wider">
+              Expected Guest Attendance by Event Date
+            </span>
+          </div>
+          <span className="text-[11px] text-zinc-500">
+            Click any date to view which sponsors & guests are attending on that day
+          </span>
+        </div>
+
+        <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={() => setSelectedDateFilter("all")}
+            className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold border transition-all ${
+              selectedDateFilter === "all"
+                ? "bg-amber-500/20 border-amber-500/40 text-amber-300 font-bold"
+                : "bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-zinc-200"
+            }`}
+          >
+            <span>All Dates</span>
+            <span className="rounded-full bg-zinc-800 px-1.5 py-0.5 text-[10px] font-bold text-zinc-300">
+              {totalGuestsCount}
+            </span>
+          </button>
+
+          {dateBreakdown.map((item) => {
+            const isSelected = selectedDateFilter === item.dateKey;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setSelectedDateFilter(isSelected ? "all" : item.dateKey)}
+                className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold border transition-all ${
+                  isSelected
+                    ? "bg-amber-500/20 border-amber-500/40 text-amber-300 font-bold"
+                    : "bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-zinc-200"
+                }`}
+                title={`${item.displayLabel}: ${item.description}`}
+              >
+                <span>{item.shortLabel}</span>
+                <span
+                  className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                    item.count > 0
+                      ? isSelected
+                        ? "bg-amber-400 text-zinc-950 font-black"
+                        : "bg-zinc-800 text-amber-400"
+                      : "bg-zinc-800/60 text-zinc-600"
+                  }`}
+                >
+                  {item.count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {selectedDateFilter !== "all" && (
+          <div className="flex items-center justify-between rounded-lg bg-amber-950/20 border border-amber-900/30 px-3 py-2 text-xs text-amber-300">
+            <span>
+              Filtering by: <strong>{dateBreakdown.find((d) => d.dateKey === selectedDateFilter)?.displayLabel || selectedDateFilter}</strong> ({filteredGuests.length} guests across {finalSponsors.length} sponsors)
+            </span>
+            <button
+              onClick={() => setSelectedDateFilter("all")}
+              className="text-[11px] underline font-bold hover:text-white"
+            >
+              Reset to All Dates
+            </button>
+          </div>
+        )}
+      </div>
+
       {/* Controls */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-zinc-900/10 border border-zinc-900 p-4 rounded-xl">
         <div className="flex flex-1 gap-2 max-w-lg">
@@ -697,6 +794,10 @@ export default function SponsorList({
                   </span>
                   <span className="rounded bg-zinc-900/50 border border-zinc-850 px-2 py-0.5 text-[10px] font-semibold text-zinc-500">
                     {completedBenefits}/{spBenefits.length} benefits
+                  </span>
+                  <span className="rounded bg-zinc-900/50 border border-zinc-850 px-2 py-0.5 text-[10px] font-semibold text-indigo-400 flex items-center gap-1">
+                    <Film className="h-3 w-3" />
+                    {media.filter((m) => m.sponsor_id === sp.id).length} media
                   </span>
                   {isWritable && (
                     <button
@@ -983,6 +1084,14 @@ export default function SponsorList({
                         </button>
                       </div>
                     )}
+
+                    {/* Photos & Videos Media Gallery */}
+                    <SponsorMediaGallery
+                      sponsorId={sp.id}
+                      sponsorName={sp.sponsor_name}
+                      initialMedia={media.filter((m) => m.sponsor_id === sp.id)}
+                      isWritable={isWritable}
+                    />
                   </div>
                 </div>
               )}
