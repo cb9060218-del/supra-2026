@@ -8,8 +8,19 @@ CREATE TABLE IF NOT EXISTS public.teams (
   created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now())
 );
 
--- Disable RLS on teams
-ALTER TABLE public.teams DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.teams ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Authenticated users can view teams" ON public.teams;
+DROP POLICY IF EXISTS "Staff can manage teams" ON public.teams;
+
+CREATE POLICY "Authenticated users can view teams"
+  ON public.teams FOR SELECT
+  USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Staff can manage teams"
+  ON public.teams FOR ALL
+  USING (public.get_user_role(auth.uid()) IN ('super_admin', 'admin', 'coordinator'))
+  WITH CHECK (public.get_user_role(auth.uid()) IN ('super_admin', 'admin', 'coordinator'));
 
 -- Seed Teams (61 competing teams)
 INSERT INTO public.teams (num, name) VALUES
@@ -85,7 +96,19 @@ CREATE TABLE IF NOT EXISTS public.fulfillment_items (
   created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now())
 );
 
-ALTER TABLE public.fulfillment_items DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.fulfillment_items ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Authenticated users can view fulfillment items" ON public.fulfillment_items;
+DROP POLICY IF EXISTS "Staff can manage fulfillment items" ON public.fulfillment_items;
+
+CREATE POLICY "Authenticated users can view fulfillment items"
+  ON public.fulfillment_items FOR SELECT
+  USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Staff can manage fulfillment items"
+  ON public.fulfillment_items FOR ALL
+  USING (public.get_user_role(auth.uid()) IN ('super_admin', 'admin', 'coordinator'))
+  WITH CHECK (public.get_user_role(auth.uid()) IN ('super_admin', 'admin', 'coordinator'));
 
 
 -- 3. Create Sticker Companies Table
@@ -96,7 +119,19 @@ CREATE TABLE IF NOT EXISTS public.sticker_companies (
   created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now())
 );
 
-ALTER TABLE public.sticker_companies DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.sticker_companies ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Authenticated users can view sticker companies" ON public.sticker_companies;
+DROP POLICY IF EXISTS "Staff can manage sticker companies" ON public.sticker_companies;
+
+CREATE POLICY "Authenticated users can view sticker companies"
+  ON public.sticker_companies FOR SELECT
+  USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Staff can manage sticker companies"
+  ON public.sticker_companies FOR ALL
+  USING (public.get_user_role(auth.uid()) IN ('super_admin', 'admin', 'coordinator'))
+  WITH CHECK (public.get_user_role(auth.uid()) IN ('super_admin', 'admin', 'coordinator'));
 
 -- Seed Sticker Companies
 INSERT INTO public.sticker_companies (company_name, sticker_size) VALUES
@@ -119,7 +154,19 @@ CREATE TABLE IF NOT EXISTS public.sticker_placements (
   UNIQUE(company_id, team_number)
 );
 
-ALTER TABLE public.sticker_placements DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.sticker_placements ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Authenticated users can view sticker placements" ON public.sticker_placements;
+DROP POLICY IF EXISTS "Staff can manage sticker placements" ON public.sticker_placements;
+
+CREATE POLICY "Authenticated users can view sticker placements"
+  ON public.sticker_placements FOR SELECT
+  USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Staff can manage sticker placements"
+  ON public.sticker_placements FOR ALL
+  USING (public.get_user_role(auth.uid()) IN ('super_admin', 'admin', 'coordinator'))
+  WITH CHECK (public.get_user_role(auth.uid()) IN ('super_admin', 'admin', 'coordinator'));
 
 
 -- 5. Create Team Sticker Overall Status Table
@@ -129,4 +176,16 @@ CREATE TABLE IF NOT EXISTS public.team_sticker_status (
   updated_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now())
 );
 
-ALTER TABLE public.team_sticker_status DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.team_sticker_status ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Authenticated users can view team sticker status" ON public.team_sticker_status;
+DROP POLICY IF EXISTS "Staff can manage team sticker status" ON public.team_sticker_status;
+
+CREATE POLICY "Authenticated users can view team sticker status"
+  ON public.team_sticker_status FOR SELECT
+  USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Staff can manage team sticker status"
+  ON public.team_sticker_status FOR ALL
+  USING (public.get_user_role(auth.uid()) IN ('super_admin', 'admin', 'coordinator'))
+  WITH CHECK (public.get_user_role(auth.uid()) IN ('super_admin', 'admin', 'coordinator'));

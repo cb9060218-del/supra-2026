@@ -523,7 +523,7 @@ $$ language sql security definer;
 -- 5. Row Level Security Policies
 -- ==========================================
 
-alter table public.users disable row level security;
+alter table public.users enable row level security;
 alter table public.sponsors enable row level security;
 alter table public.sponsor_benefits enable row level security;
 alter table public.sponsor_interactions enable row level security;
