@@ -2,7 +2,8 @@
 
 import React, { useState, useTransition } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { ChevronDown, ChevronRight, Check, Search, Plus, ShieldAlert, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Check, Search, Plus, ShieldAlert, Trash2, FileSpreadsheet } from "lucide-react";
+import * as XLSX from "xlsx";
 
 interface Team {
   num: string;
@@ -190,6 +191,49 @@ export default function StickersView({
     });
   };
 
+  const handleExportExcel = () => {
+    // 1. Team Placement Matrix
+    const matrixData = initialTeams.map((t, idx) => {
+      const overall = overallStatus.find((o) => o.team_number === t.num)?.is_placed;
+      const row: Record<string, any> = {
+        "Sr No": idx + 1,
+        "Team Number": t.num,
+        "Team Name": t.name,
+        "Overall Stickering Completed": overall ? "YES" : "NO",
+      };
+
+      companies.forEach((c) => {
+        const isPlaced = placements.some(
+          (p) => p.company_id === c.id && p.team_number === t.num && p.is_placed
+        );
+        row[`${c.company_name} (${c.sticker_size || "Standard"})`] = isPlaced ? "PLACED" : "PENDING";
+      });
+
+      return row;
+    });
+
+    // 2. Company Summary
+    const companySummary = companies.map((c, idx) => {
+      const compPlacements = placements.filter((p) => p.company_id === c.id && p.is_placed).length;
+      const pct = initialTeams.length ? Math.round((compPlacements / initialTeams.length) * 100) : 0;
+      return {
+        "Sr No": idx + 1,
+        "Sponsor Company": c.company_name,
+        "Sticker Size": c.sticker_size || "-",
+        "Teams Stickered": `${compPlacements} / ${initialTeams.length}`,
+        "Completion %": `${pct}%`,
+        "Pending Teams": initialTeams.length - compPlacements,
+      };
+    });
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(matrixData), "Placement Matrix");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(companySummary), "Company Summary");
+
+    const dateStr = new Date().toISOString().split("T")[0];
+    XLSX.writeFile(wb, `SUPRA_2026_Vehicle_Sticker_Placement_Report_${dateStr}.xlsx`);
+  };
+
   return (
     <div className="space-y-8 max-w-5xl">
       {/* Title */}
@@ -202,14 +246,26 @@ export default function StickersView({
             Check off which sponsors' stickers have been placed on which competing teams' formula cars.
           </p>
         </div>
-        {isWritable && (
+
+        <div className="flex items-center gap-2 flex-wrap">
           <button
-            onClick={() => setShowAddForm(!showAddForm)}
-            className="self-start inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-zinc-100 dark:text-zinc-950 font-bold text-xs px-4 py-2.5 transition-all"
+            onClick={handleExportExcel}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-2.5 transition-all shadow-sm"
+            title="Download Vehicle Sticker Placement Matrix in Excel format"
           >
-            <Plus className="h-4 w-4" /> Add company for stickers
+            <FileSpreadsheet className="h-4 w-4" />
+            <span>Download Excel</span>
           </button>
-        )}
+
+          {isWritable && (
+            <button
+              onClick={() => setShowAddForm(!showAddForm)}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-zinc-100 dark:text-zinc-950 font-bold text-xs px-4 py-2.5 transition-all shadow-sm"
+            >
+              <Plus className="h-4 w-4" /> Add company for stickers
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Add Company Form */}

@@ -14,7 +14,9 @@ import {
   Calendar,
   Film,
   Image as ImageIcon,
+  FileSpreadsheet,
 } from "lucide-react";
+import * as XLSX from "xlsx";
 import { formatCurrency } from "@/lib/utils";
 import {
   computeGuestDateBreakdown,
@@ -266,6 +268,83 @@ export default function SponsorList({
   const gpYesCount = guests.filter((g) => getGuestStatus(g).gatePass).length;
   const gpNoCount = guests.filter((g) => !getGuestStatus(g).gatePass).length;
   const totalSponsorsCount = sponsors.length;
+
+  // 4. Excel Export Function
+  const handleExportExcel = () => {
+    // Sheet 1: Sponsors Master
+    const sponsorsData = sponsors.map((sp, idx) => {
+      const spGuests = getSponsorAllGuests(sp.id);
+      const spConfirmed = spGuests.filter((g) => getGuestStatus(g).confirmed === "Confirmed").length;
+      const spBenefits = benefits.filter((b) => b.sponsor_id === sp.id);
+      const spCompBenefits = spBenefits.filter((b) => b.status === "completed").length;
+      const pct = spBenefits.length ? Math.round((spCompBenefits / spBenefits.length) * 100) : 0;
+
+      return {
+        "Sr No": idx + 1,
+        "Sponsor Name": sp.sponsor_name,
+        "Tier": sp.sponsor_tier_label || sp.sponsor_tier,
+        "Sponsorship Amount (Rs)": sp.sponsorship_amount,
+        "Payment Status": sp.payment_status || "-",
+        "Lead Status": sp.lead_status || "-",
+        "Total Entitled Benefits": spBenefits.length,
+        "Completed Benefits": spCompBenefits,
+        "Benefits Completion %": `${pct}%`,
+        "Total Registered Guests": spGuests.length,
+        "Confirmed Guests": spConfirmed,
+        "Contact Person": sp.contact_person || "-",
+        "Email": sp.email || "-",
+        "Phone": sp.phone || "-",
+        "Notes": sp.notes || "-",
+      };
+    });
+
+    // Sheet 2: All Guests List
+    const guestsData = guests.map((g, idx) => {
+      const sponsor = sponsors.find((s) => s.id === g.sponsor_id);
+      const st = getGuestStatus(g);
+
+      return {
+        "Sr No": idx + 1,
+        "Guest Name": g.guest_name,
+        "Sponsor Company": sponsor?.sponsor_name || "Direct Guest",
+        "Designation": g.designation || "-",
+        "Attendance RSVP": st.confirmed,
+        "Gate Pass Status": st.gatePass ? "ISSUED" : "NOT ISSUED",
+        "Guest Category": g.guest_role || "sponsor",
+        "Email": g.email || "-",
+        "Phone": g.phone || "-",
+        "Expected Date / Remarks": g.remarks || "-",
+      };
+    });
+
+    // Sheet 3: Benefits Checklist
+    const benefitsData = benefits.map((b, idx) => {
+      const sponsor = sponsors.find((s) => s.id === b.sponsor_id);
+      return {
+        "Sr No": idx + 1,
+        "Sponsor Name": sponsor?.sponsor_name || "-",
+        "Sponsor Tier": sponsor?.sponsor_tier_label || sponsor?.sponsor_tier || "-",
+        "Benefit Deliverable": b.benefit_name,
+        "Status": b.status === "completed" ? "COMPLETED" : "PENDING",
+      };
+    });
+
+    // Sheet 4: Expected Date Breakdown
+    const dateData = dateBreakdown.map((d) => ({
+      "Date / Milestone": d.displayLabel,
+      "Expected Guests Count": d.count,
+      "Description": d.description,
+    }));
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(sponsorsData), "Sponsors Overview");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(guestsData), "Guests RSVP & Gatepasses");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(benefitsData), "Benefits Deliverables");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dateData), "Attendance by Date");
+
+    const dateStr = new Date().toISOString().split("T")[0];
+    XLSX.writeFile(wb, `SUPRA_2026_Sponsors_CRM_Master_Report_${dateStr}.xlsx`);
+  };
 
   // Form Submissions
   const handleAddSponsor = (e: React.FormEvent) => {
@@ -642,15 +721,30 @@ export default function SponsorList({
         </div>
       </div>
 
-      {/* Add Sponsor Button & Form */}
-      {isWritable && (
-        <div className="space-y-4">
+      {/* Action Buttons Toolbar (Download Excel & Add Sponsor) */}
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <button
+          onClick={handleExportExcel}
+          className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 transition-all shadow-sm"
+          title="Download complete Sponsors, Guests, and Benefits Excel spreadsheet report"
+        >
+          <FileSpreadsheet className="h-4 w-4" />
+          <span>Download Excel Report</span>
+        </button>
+
+        {isWritable && (
           <button
             onClick={() => setIsAddSponsorOpen(!isAddSponsorOpen)}
             className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 px-4 py-2.5 text-xs text-zinc-200 font-bold transition-all"
           >
             <Plus className="h-4 w-4" /> Add New Sponsor
           </button>
+        )}
+      </div>
+
+      {/* Add Sponsor Form Modal / Drawer */}
+      {isWritable && (
+        <div className="space-y-4">
 
           {isAddSponsorOpen && (
             <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-6 space-y-4">
