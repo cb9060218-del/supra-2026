@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Award,
   Layers,
+  Shirt,
   Settings,
   History,
   ShieldCheck,
@@ -48,6 +49,7 @@ export default function Sidebar({ user }: SidebarProps) {
     { name: "Overview", href: "/dashboard", icon: LayoutDashboard, roles: ["super_admin", "admin", "coordinator", "viewer"] },
     { name: "Sponsors CRM", href: "/dashboard/sponsors", icon: Award, roles: ["super_admin", "admin", "coordinator", "viewer"] },
     { name: "Stickers Tracker", href: "/dashboard/stickers", icon: Layers, roles: ["super_admin", "admin", "coordinator", "viewer"] },
+    { name: "Kits Tracker", href: "/dashboard/kits", icon: Shirt, roles: ["super_admin", "admin", "coordinator", "viewer"] },
     { name: "Settings", href: "/dashboard/settings", icon: Settings, roles: ["super_admin", "admin", "coordinator", "viewer"] },
   ];
 

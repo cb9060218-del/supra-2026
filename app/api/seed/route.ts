@@ -239,6 +239,9 @@ export async function GET(request: NextRequest) {
     await supabase.from("teams").delete().neq("name", "FORCE_DELETE_ALL");
     await supabase.from("sticker_companies").delete().neq("company_name", "FORCE_DELETE_ALL");
     await supabase.from("fulfillment_items").delete().neq("company_name", "FORCE_DELETE_ALL");
+    try {
+      await supabase.from("kits_distribution").delete().neq("person_name", "FORCE_DELETE_ALL");
+    } catch {}
   }
 
   // 1. Seed sponsors if empty
@@ -287,7 +290,47 @@ export async function GET(request: NextRequest) {
     await supabase.from("fulfillment_items").insert(CUBICLES_SEED);
   }
 
-  // 6. Seed sponsor benefits if empty
+  // 6. Seed kits distribution if empty
+  let kitsCount = 0;
+  try {
+    const { count: kc } = await supabase
+      .from("kits_distribution")
+      .select("id", { count: "exact", head: true });
+    kitsCount = kc || 0;
+
+    if (!kitsCount || kitsCount === 0) {
+      const KITS_SEED = [
+        { person_name: "Dr. K. C. Vora", category: "OC", organization: "SAEINDIA", role_designation: "OC Chairman", shirt_size: "XL", kit_issued: false, sponsor_tshirt_given: false, remarks: "Main Stage Kit" },
+        { person_name: "Mr. I. V. Rao", category: "OC", organization: "TERI / Maruti Suzuki", role_designation: "Distinguished Fellow & Advisor", shirt_size: "L", kit_issued: false, sponsor_tshirt_given: false, remarks: "VIP Kit" },
+        { person_name: "Mr. Sanjay Deshpande", category: "OC", organization: "SAEINDIA", role_designation: "Convener SUPRA 2026", shirt_size: "L", kit_issued: false, sponsor_tshirt_given: false, remarks: "VIP Kit" },
+        { person_name: "Mr. Rakesh Sood", category: "OC", organization: "SAEINDIA", role_designation: "Co-Convener", shirt_size: "XL", kit_issued: false, sponsor_tshirt_given: false, remarks: "VIP Kit" },
+        { person_name: "Mr. Saurabh Srivastava", category: "OC", organization: "Senvion", role_designation: "Technical Committee Head", shirt_size: "M", kit_issued: false, sponsor_tshirt_given: false, remarks: "Tech Hangar" },
+        { person_name: "Mr. Mayank Nigam", category: "OC", organization: "ACMA", role_designation: "Logistics & Event Ops", shirt_size: "L", kit_issued: false, sponsor_tshirt_given: false, remarks: "Ops Room" },
+        { person_name: "Mr. Hemant Kumar", category: "OC", organization: "ACMA", role_designation: "Event Coordinator", shirt_size: "M", kit_issued: false, sponsor_tshirt_given: false, remarks: "Ops Room" },
+        { person_name: "Mr. Ashish Jindal", category: "OC", organization: "Munjal Kiriu", role_designation: "Industry Liaison", shirt_size: "L", kit_issued: false, sponsor_tshirt_given: false, remarks: "Paddock Ops" },
+        { person_name: "Dr. Arun Jaura", category: "Jury", organization: "Hero MotoCorp", role_designation: "Chief Judge - Design Evaluation", shirt_size: "XL", kit_issued: false, sponsor_tshirt_given: false, remarks: "Design Bay" },
+        { person_name: "Mr. B. Srinivas", category: "Jury", organization: "Maruti Suzuki", role_designation: "Chief Judge - Cost & Manufacturing", shirt_size: "L", kit_issued: false, sponsor_tshirt_given: false, remarks: "Cost Hangar" },
+        { person_name: "Mr. Anand Kulkarni", category: "Jury", organization: "Tata Motors", role_designation: "Chief Judge - Business Presentation", shirt_size: "L", kit_issued: false, sponsor_tshirt_given: false, remarks: "Presentation Room" },
+        { person_name: "Mr. Rohit Sangwan", category: "Jury", organization: "Synopsys / Ansys", role_designation: "Technical Scrutineer", shirt_size: "M", kit_issued: false, sponsor_tshirt_given: true, remarks: "Scrutineering Bay" },
+        { person_name: "Mr. Irshad Ahmad", category: "Jury", organization: "Validate India", role_designation: "Technical Scrutineer", shirt_size: "L", kit_issued: false, sponsor_tshirt_given: true, remarks: "Scrutineering Bay" },
+        { person_name: "Mr. Thomas Mathew", category: "Jury", organization: "Migatronic", role_designation: "Hot Pit Safety Judge", shirt_size: "XL", kit_issued: false, sponsor_tshirt_given: true, remarks: "Hot Pit Area" },
+        { person_name: "Mr. Azmat Hussain", category: "Jury", organization: "Morphine Motorsports", role_designation: "Dynamic Events Judge", shirt_size: "M", kit_issued: false, sponsor_tshirt_given: true, remarks: "Track Control" },
+        { person_name: "Mr. Yash Agrawal", category: "Jury", organization: "Morphine Motorsports", role_designation: "Track Safety Official", shirt_size: "L", kit_issued: false, sponsor_tshirt_given: true, remarks: "Track Control" },
+        { person_name: "Mukul Yudhveer Singh", category: "Sponsor", organization: "AutoCar", role_designation: "Media Partner Lead", shirt_size: "L", kit_issued: false, sponsor_tshirt_given: true, remarks: "Media Center" },
+        { person_name: "Arushi Rawat", category: "Sponsor", organization: "ETAuto", role_designation: "Principal Correspondent", shirt_size: "M", kit_issued: false, sponsor_tshirt_given: true, remarks: "Media Center" },
+        { person_name: "Arup Tyagi", category: "Sponsor", organization: "Ansys", role_designation: "Sr. Manager Academic Programs", shirt_size: "L", kit_issued: false, sponsor_tshirt_given: true, remarks: "Sponsor Hangar" },
+        { person_name: "Amit Kumar Mehta", category: "Sponsor", organization: "Validate", role_designation: "Director Technical", shirt_size: "XL", kit_issued: false, sponsor_tshirt_given: true, remarks: "Sponsor Hangar" },
+        { person_name: "Shardool Singh", category: "Sponsor", organization: "ACMA", role_designation: "Regional Secretary", shirt_size: "L", kit_issued: false, sponsor_tshirt_given: true, remarks: "VIP Lounge" },
+        { person_name: "Pardeep Goyal", category: "Sponsor", organization: "BPCL", role_designation: "Business Head (Retail)", shirt_size: "XL", kit_issued: false, sponsor_tshirt_given: true, remarks: "VIP Lounge" },
+        { person_name: "Achman Trehan", category: "Sponsor", organization: "BPCL", role_designation: "Head Retail North", shirt_size: "L", kit_issued: false, sponsor_tshirt_given: true, remarks: "VIP Lounge" },
+        { person_name: "Harsh Vardhan Jain", category: "Sponsor", organization: "Migatronic", role_designation: "Head - Automation & Application", shirt_size: "L", kit_issued: false, sponsor_tshirt_given: true, remarks: "Hot Pit Sponsor" }
+      ];
+      await supabase.from("kits_distribution").insert(KITS_SEED);
+      kitsCount = KITS_SEED.length;
+    }
+  } catch {}
+
+  // 7. Seed sponsor benefits if empty
   const { count: benefitsCount } = await supabase
     .from("sponsor_benefits")
     .select("id", { count: "exact", head: true });
@@ -326,6 +369,7 @@ export async function GET(request: NextRequest) {
       teams: teamsCount || TEAMS_SEED.length,
       sticker_companies: stickerCount || STICKER_SPONSORS_SEED.length,
       fulfillment_items: fulfillmentCount || CUBICLES_SEED.length,
+      kits_distribution: kitsCount,
       sponsor_benefits: benefitsCount
     }
   });
