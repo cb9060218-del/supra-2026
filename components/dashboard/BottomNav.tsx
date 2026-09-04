@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Award,
+  Send,
   Layers,
   Shirt,
   Settings,
@@ -24,6 +25,7 @@ export default function BottomNav({ user }: BottomNavProps) {
   const navigation = [
     { name: "Home", href: "/dashboard", icon: LayoutDashboard, roles: ["super_admin", "admin", "coordinator", "viewer"] },
     { name: "Sponsors", href: "/dashboard/sponsors", icon: Award, roles: ["super_admin", "admin", "coordinator", "viewer"] },
+    { name: "Outreach", href: "/dashboard/outreach", icon: Send, roles: ["super_admin", "admin", "coordinator", "viewer"] },
     { name: "Stickers", href: "/dashboard/stickers", icon: Layers, roles: ["super_admin", "admin", "coordinator", "viewer"] },
     { name: "Kits", href: "/dashboard/kits", icon: Shirt, roles: ["super_admin", "admin", "coordinator", "viewer"] },
     { name: "Settings", href: "/dashboard/settings", icon: Settings, roles: ["super_admin", "admin", "coordinator", "viewer"] },
