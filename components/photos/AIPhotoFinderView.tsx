@@ -215,16 +215,56 @@ export default function AIPhotoFinderView({
     "face_search" | "image_search" | "my_photos" | "gallery" | "upload_center"
   >("face_search");
 
-  // Fallback to DEFAULT_EVENT_PHOTOS if initialPhotos is empty
-  const [photos, setPhotos] = useState<EventPhoto[]>(
-    initialPhotos && initialPhotos.length > 0 ? initialPhotos : DEFAULT_EVENT_PHOTOS
-  );
+  // Load deleted IDs from localStorage on startup
+  const [deletedIds, setDeletedIds] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("supra_deleted_photo_ids");
+        return saved ? JSON.parse(saved) : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
+
+  // Initialize photos filtering out any deleted IDs
+  const [photos, setPhotos] = useState<EventPhoto[]>(() => {
+    const base = initialPhotos && initialPhotos.length > 0 ? initialPhotos : DEFAULT_EVENT_PHOTOS;
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("supra_deleted_photo_ids");
+        if (saved) {
+          const parsed: string[] = JSON.parse(saved);
+          return base.filter((p) => !parsed.includes(p.id));
+        }
+      } catch {}
+    }
+    return base;
+  });
+
   const [selectedPhotoIds, setSelectedPhotoIds] = useState<string[]>([]);
   const [lightboxPhoto, setLightboxPhoto] = useState<EventPhoto | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isDownloadingZip, setIsDownloadingZip] = useState(false);
 
   const isOrganizer = true; // Enabled for full organizer and attendee access
+
+  // Sync deleted IDs from localStorage on mount
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("supra_deleted_photo_ids");
+        if (saved) {
+          const parsed: string[] = JSON.parse(saved);
+          if (parsed.length > 0) {
+            setDeletedIds(parsed);
+            setPhotos((prev) => prev.filter((p) => !parsed.includes(p.id)));
+          }
+        }
+      } catch {}
+    }
+  }, []);
 
   // ----------------------------------------------------
   // FACE SEARCH STATE
@@ -268,10 +308,19 @@ export default function AIPhotoFinderView({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // ----------------------------------------------------
-  // DELETE HANDLERS
+  // DELETE HANDLERS (Permanently persists deletions)
   // ----------------------------------------------------
   const handleDeletePhoto = (id: string, title: string) => {
     if (!confirm(`Are you sure you want to delete "${title}" from the event gallery?`)) return;
+
+    // Permanently persist deleted ID
+    const nextDeleted = Array.from(new Set([...deletedIds, id]));
+    setDeletedIds(nextDeleted);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("supra_deleted_photo_ids", JSON.stringify(nextDeleted));
+      } catch {}
+    }
 
     setPhotos((prev) => prev.filter((p) => p.id !== id));
     setSelectedPhotoIds((prev) => prev.filter((item) => item !== id));
@@ -290,6 +339,14 @@ export default function AIPhotoFinderView({
     if (!confirm(`Are you sure you want to delete ${selectedPhotoIds.length} selected photos?`)) return;
 
     const idsToDelete = [...selectedPhotoIds];
+    const nextDeleted = Array.from(new Set([...deletedIds, ...idsToDelete]));
+    setDeletedIds(nextDeleted);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("supra_deleted_photo_ids", JSON.stringify(nextDeleted));
+      } catch {}
+    }
+
     setPhotos((prev) => prev.filter((p) => !idsToDelete.includes(p.id)));
     setSelectedPhotoIds([]);
     setFaceSearchResults((prev) => prev.filter((r) => !idsToDelete.includes(r.photo.id)));
@@ -301,6 +358,16 @@ export default function AIPhotoFinderView({
         await deleteEventPhotoAction(id);
       }
     });
+  };
+
+  const handleRestoreDefaultPhotos = () => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("supra_deleted_photo_ids");
+      } catch {}
+    }
+    setDeletedIds([]);
+    setPhotos(DEFAULT_EVENT_PHOTOS);
   };
 
   // ----------------------------------------------------
@@ -567,10 +634,10 @@ export default function AIPhotoFinderView({
     startTransition(async () => {
       const res = await importGoogleDriveFolderAction(driveUrl, uploadCategory);
       setUploadProgress(100);
-      if (res?.success) {
+      if (res && "count" in res) {
         setUploadStatusMsg(`✅ Successfully imported and indexed ${res.count} event photos from Google Drive!`);
       } else {
-        alert("Import error: " + (res?.error || "Invalid Drive Link"));
+        alert("Import error: " + (res && "error" in res ? res.error : "Invalid Drive Link"));
       }
     });
   };
@@ -1293,7 +1360,7 @@ export default function AIPhotoFinderView({
               </div>
               <div className="flex items-center gap-3 flex-wrap justify-center">
                 <button
-                  onClick={() => setPhotos(DEFAULT_EVENT_PHOTOS)}
+                  onClick={handleRestoreDefaultPhotos}
                   className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold text-xs px-4 py-2.5 transition-all shadow-sm"
                 >
                   <RefreshCw className="h-4 w-4" />
