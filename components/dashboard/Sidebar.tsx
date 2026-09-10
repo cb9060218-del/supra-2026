@@ -9,6 +9,7 @@ import {
   Send,
   Layers,
   Shirt,
+  Camera,
   Settings,
   History,
   ShieldCheck,
@@ -52,6 +53,7 @@ export default function Sidebar({ user }: SidebarProps) {
     { name: "Sponsor Outreach", href: "/dashboard/outreach", icon: Send, roles: ["super_admin", "admin", "coordinator", "viewer"] },
     { name: "Stickers Tracker", href: "/dashboard/stickers", icon: Layers, roles: ["super_admin", "admin", "coordinator", "viewer"] },
     { name: "Kits Tracker", href: "/dashboard/kits", icon: Shirt, roles: ["super_admin", "admin", "coordinator", "viewer"] },
+    { name: "AI Photo Finder", href: "/dashboard/photos", icon: Camera, roles: ["super_admin", "admin", "coordinator", "viewer"] },
     { name: "Settings", href: "/dashboard/settings", icon: Settings, roles: ["super_admin", "admin", "coordinator", "viewer"] },
   ];
 
