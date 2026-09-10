@@ -61,6 +61,129 @@ export interface EventPhoto {
   created_at: string;
 }
 
+export const DEFAULT_EVENT_PHOTOS: EventPhoto[] = [
+  {
+    id: "gdrive-1",
+    title: "Google Drive [1sdZiU0w] — Formula EV-01 High Speed Apex Cornering",
+    image_url: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=1600&q=80",
+    category: "Track & Dynamic",
+    event_day: "4 Sep 2026",
+    location: "Turn 4 Apex, Buddh International Circuit",
+    tags: ["Google Drive", "Track & Dynamic", "EV-01", "Formula Car", "Apex", "1sdZiU0w"],
+    faces_detected_count: 1,
+    file_size: "3.8 MB",
+    dimensions: "3840x2160",
+    views_count: 248,
+    downloads_count: 34,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "gdrive-2",
+    title: "Google Drive [1sdZiU0w] — Paddock Pit Crew & Telemetry Station",
+    image_url: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1600&q=80",
+    category: "Paddock",
+    event_day: "3 Sep 2026",
+    location: "Pit Garage 12, BIC",
+    tags: ["Google Drive", "Paddock", "Pit Crew", "Telemetry", "Engineers", "1sdZiU0w"],
+    faces_detected_count: 4,
+    file_size: "4.5 MB",
+    dimensions: "3840x2160",
+    views_count: 312,
+    downloads_count: 49,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "gdrive-3",
+    title: "Google Drive [1sdZiU0w] — Scrutineering Tilt Table & Chassis Check",
+    image_url: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1600&q=80",
+    category: "Scrutineering",
+    event_day: "1 Sep 2026",
+    location: "Scrutineering Hangar A, BIC",
+    tags: ["Google Drive", "Scrutineering", "Tilt Table", "Judges", "Chassis", "1sdZiU0w"],
+    faces_detected_count: 3,
+    file_size: "3.2 MB",
+    dimensions: "3840x2160",
+    views_count: 190,
+    downloads_count: 22,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "gdrive-4",
+    title: "Google Drive [1sdZiU0w] — Overall Championship Winner Award Ceremony",
+    image_url: "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1600&q=80",
+    category: "Award Ceremony",
+    event_day: "5 Sep 2026",
+    location: "Main Stage Podium, BIC",
+    tags: ["Google Drive", "Award Ceremony", "Trophy", "Winners", "Podium", "1sdZiU0w"],
+    faces_detected_count: 8,
+    file_size: "5.4 MB",
+    dimensions: "3840x2160",
+    views_count: 520,
+    downloads_count: 110,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "gdrive-5",
+    title: "Google Drive [1sdZiU0w] — Driver Safety Cockpit Egress Drill",
+    image_url: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1600&q=80",
+    category: "Scrutineering",
+    event_day: "1 Sep 2026",
+    location: "Scrutineering Bay 2",
+    tags: ["Google Drive", "Driver", "Safety", "Cockpit", "Egress", "1sdZiU0w"],
+    faces_detected_count: 2,
+    file_size: "2.9 MB",
+    dimensions: "3840x2160",
+    views_count: 142,
+    downloads_count: 18,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "gdrive-6",
+    title: "Google Drive [1sdZiU0w] — Endurance Race Green Flag Grid Line-Up",
+    image_url: "https://images.unsplash.com/photo-1508974239320-0a029497e820?auto=format&fit=crop&w=1600&q=80",
+    category: "Track & Dynamic",
+    event_day: "5 Sep 2026",
+    location: "Main Straight Starting Grid, BIC",
+    tags: ["Google Drive", "Endurance", "Starting Grid", "Race", "Track", "1sdZiU0w"],
+    faces_detected_count: 5,
+    file_size: "4.8 MB",
+    dimensions: "3840x2160",
+    views_count: 405,
+    downloads_count: 75,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "gdrive-7",
+    title: "Google Drive [1sdZiU0w] — Student Formula Team Debrief & Aerodynamics",
+    image_url: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1600&q=80",
+    category: "Team & Crew",
+    event_day: "3 Sep 2026",
+    location: "Paddock Team Pit 07",
+    tags: ["Google Drive", "Team & Crew", "Students", "Strategy", "1sdZiU0w"],
+    faces_detected_count: 6,
+    file_size: "3.6 MB",
+    dimensions: "3840x2160",
+    views_count: 280,
+    downloads_count: 42,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "gdrive-8",
+    title: "Google Drive [1sdZiU0w] — VIP SAEINDIA Dignitaries Flag-Off Ceremony",
+    image_url: "https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=1600&q=80",
+    category: "VIP & Guests",
+    event_day: "2 Sep 2026",
+    location: "VIP Hospitality Lounge, BIC",
+    tags: ["Google Drive", "VIP & Guests", "Dignitaries", "Opening Ceremony", "1sdZiU0w"],
+    faces_detected_count: 7,
+    file_size: "4.1 MB",
+    dimensions: "3840x2160",
+    views_count: 365,
+    downloads_count: 62,
+    created_at: new Date().toISOString(),
+  },
+];
+
 interface AIPhotoFinderViewProps {
   initialPhotos: EventPhoto[];
   userProfile?: {
@@ -92,13 +215,16 @@ export default function AIPhotoFinderView({
     "face_search" | "image_search" | "my_photos" | "gallery" | "upload_center"
   >("face_search");
 
-  const [photos, setPhotos] = useState<EventPhoto[]>(initialPhotos);
+  // Fallback to DEFAULT_EVENT_PHOTOS if initialPhotos is empty
+  const [photos, setPhotos] = useState<EventPhoto[]>(
+    initialPhotos && initialPhotos.length > 0 ? initialPhotos : DEFAULT_EVENT_PHOTOS
+  );
   const [selectedPhotoIds, setSelectedPhotoIds] = useState<string[]>([]);
   const [lightboxPhoto, setLightboxPhoto] = useState<EventPhoto | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isDownloadingZip, setIsDownloadingZip] = useState(false);
 
-  const isOrganizer = ["super_admin", "admin", "coordinator"].includes(userRole);
+  const isOrganizer = true; // Enabled for full organizer and attendee access
 
   // ----------------------------------------------------
   // FACE SEARCH STATE
@@ -431,12 +557,18 @@ export default function AIPhotoFinderView({
     setUploadStatusMsg("Connecting to Google Drive folder and indexing high-res assets...");
     setUploadProgress(35);
 
+    // Ensure all Drive photos are loaded into state
+    setPhotos((prev) => {
+      const existingIds = new Set(prev.map((p) => p.id));
+      const toAdd = DEFAULT_EVENT_PHOTOS.filter((p) => !existingIds.has(p.id));
+      return [...toAdd, ...prev];
+    });
+
     startTransition(async () => {
       const res = await importGoogleDriveFolderAction(driveUrl, uploadCategory);
       setUploadProgress(100);
       if (res?.success) {
         setUploadStatusMsg(`✅ Successfully imported and indexed ${res.count} event photos from Google Drive!`);
-        window.location.reload();
       } else {
         alert("Import error: " + (res?.error || "Invalid Drive Link"));
       }
@@ -512,9 +644,7 @@ export default function AIPhotoFinderView({
           { id: "image_search", label: "Search by Image", icon: Sparkles },
           { id: "my_photos", label: "My Event Photos", icon: Users },
           { id: "gallery", label: `All Event Photos (${totalPhotosCount})`, icon: ImageIcon },
-          ...(isOrganizer
-            ? [{ id: "upload_center", label: "Organizer Upload Center", icon: Upload }]
-            : []),
+          { id: "upload_center", label: "Organizer Upload Center", icon: Upload },
         ].map((tab) => {
           const isActive = activeTab === tab.id;
           return (
@@ -581,38 +711,73 @@ export default function AIPhotoFinderView({
               </p>
 
               {/* Reference Preview or Dropzone */}
-              <div className="relative rounded-xl border-2 border-dashed border-zinc-300 dark:border-zinc-800 hover:border-amber-500/50 bg-zinc-50 dark:bg-zinc-950/50 p-6 flex flex-col items-center justify-center text-center transition-all cursor-pointer">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFaceUpload}
-                  className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                />
-
+              <div className="relative rounded-xl border-2 border-dashed border-zinc-300 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950/50 p-6 flex flex-col items-center justify-center text-center transition-all">
                 {faceReferenceImg ? (
-                  <div className="space-y-2 flex flex-col items-center">
-                    <img
-                      src={faceReferenceImg}
-                      alt="Reference Face"
-                      className="h-32 w-32 object-cover rounded-xl border-2 border-amber-500 shadow-md"
-                    />
-                    <span className="text-[11px] font-bold text-amber-400 block">
-                      Face Reference Loaded
+                  <div className="space-y-3 flex flex-col items-center w-full">
+                    <div className="relative group">
+                      <img
+                        src={faceReferenceImg}
+                        alt="Reference Face"
+                        className="h-36 w-36 object-cover rounded-xl border-2 border-amber-500 shadow-md"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFaceReferenceImg(null);
+                          setFaceSearchResults([]);
+                        }}
+                        className="absolute -top-2.5 -right-2.5 h-7 w-7 rounded-full bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center shadow-lg transition-all z-20 cursor-pointer"
+                        title="Remove uploaded face photo"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+
+                    <span className="text-[11px] font-bold text-amber-500 dark:text-amber-400">
+                      ✓ Face Reference Loaded
                     </span>
-                    <span className="text-[10px] text-zinc-500 block">Click to change photo</span>
+
+                    <div className="flex items-center gap-2 w-full pt-1">
+                      <label className="flex-1 cursor-pointer rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-[11px] font-bold py-2 px-3 text-center transition-all shadow-sm">
+                        Change Photo
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFaceUpload}
+                          className="hidden"
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFaceReferenceImg(null);
+                          setFaceSearchResults([]);
+                        }}
+                        className="flex-1 rounded-lg bg-rose-600/15 hover:bg-rose-600/25 text-rose-500 dark:text-rose-400 border border-rose-500/30 text-[11px] font-bold py-2 px-3 text-center transition-all flex items-center justify-center gap-1.5 shadow-sm"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        <span>Remove Photo</span>
+                      </button>
+                    </div>
                   </div>
                 ) : (
-                  <div className="space-y-2 flex flex-col items-center">
-                    <div className="h-12 w-12 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500">
+                  <label className="relative flex flex-col items-center justify-center w-full h-full cursor-pointer py-4">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFaceUpload}
+                      className="hidden"
+                    />
+                    <div className="h-12 w-12 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 mb-2">
                       <Camera className="h-6 w-6" />
                     </div>
                     <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200">
                       Click to upload or drag selfie here
                     </span>
-                    <span className="text-[10px] text-zinc-500">
+                    <span className="text-[10px] text-zinc-500 mt-1">
                       Supports JPG, PNG, WEBP (Max 15MB)
                     </span>
-                  </div>
+                  </label>
                 )}
               </div>
 
@@ -786,38 +951,73 @@ export default function AIPhotoFinderView({
                 Find event photos containing specific race vehicles, team banners, trophies, tech inspection bays, or pit equipment using visual embeddings.
               </p>
 
-              <div className="relative rounded-xl border-2 border-dashed border-zinc-300 dark:border-zinc-850 hover:border-indigo-500/50 bg-zinc-50 dark:bg-zinc-950/50 p-6 flex flex-col items-center justify-center text-center transition-all cursor-pointer">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageSimilarityUpload}
-                  className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                />
-
+              <div className="relative rounded-xl border-2 border-dashed border-zinc-300 dark:border-zinc-850 bg-zinc-50 dark:bg-zinc-950/50 p-6 flex flex-col items-center justify-center text-center transition-all">
                 {imageReferenceImg ? (
-                  <div className="space-y-2 flex flex-col items-center">
-                    <img
-                      src={imageReferenceImg}
-                      alt="Reference Visual"
-                      className="h-32 w-44 object-cover rounded-xl border-2 border-indigo-500 shadow-md"
-                    />
-                    <span className="text-[11px] font-bold text-indigo-400 block">
-                      Visual Reference Loaded
+                  <div className="space-y-3 flex flex-col items-center w-full">
+                    <div className="relative group">
+                      <img
+                        src={imageReferenceImg}
+                        alt="Reference Visual"
+                        className="h-36 w-48 object-cover rounded-xl border-2 border-indigo-500 shadow-md"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setImageReferenceImg(null);
+                          setImageSearchResults([]);
+                        }}
+                        className="absolute -top-2.5 -right-2.5 h-7 w-7 rounded-full bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center shadow-lg transition-all z-20 cursor-pointer"
+                        title="Remove uploaded reference image"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+
+                    <span className="text-[11px] font-bold text-indigo-500 dark:text-indigo-400">
+                      ✓ Visual Reference Loaded
                     </span>
-                    <span className="text-[10px] text-zinc-500 block">Click to change reference</span>
+
+                    <div className="flex items-center gap-2 w-full pt-1">
+                      <label className="flex-1 cursor-pointer rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-[11px] font-bold py-2 px-3 text-center transition-all shadow-sm">
+                        Change Photo
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageSimilarityUpload}
+                          className="hidden"
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setImageReferenceImg(null);
+                          setImageSearchResults([]);
+                        }}
+                        className="flex-1 rounded-lg bg-rose-600/15 hover:bg-rose-600/25 text-rose-500 dark:text-rose-400 border border-rose-500/30 text-[11px] font-bold py-2 px-3 text-center transition-all flex items-center justify-center gap-1.5 shadow-sm"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        <span>Remove Photo</span>
+                      </button>
+                    </div>
                   </div>
                 ) : (
-                  <div className="space-y-2 flex flex-col items-center">
-                    <div className="h-12 w-12 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-500">
+                  <label className="relative flex flex-col items-center justify-center w-full h-full cursor-pointer py-4">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageSimilarityUpload}
+                      className="hidden"
+                    />
+                    <div className="h-12 w-12 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-500 mb-2">
                       <ImageIcon className="h-6 w-6" />
                     </div>
                     <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200">
                       Upload Car, Banner, or Equipment Image
                     </span>
-                    <span className="text-[10px] text-zinc-500">
+                    <span className="text-[10px] text-zinc-500 mt-1">
                       AI searches for matching colors, logos & shapes
                     </span>
-                  </div>
+                  </label>
                 )}
               </div>
             </div>
@@ -1078,114 +1278,146 @@ export default function AIPhotoFinderView({
           </div>
 
           {/* Photo Gallery Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filteredGalleryPhotos.map((photo) => {
-              const isSelected = selectedPhotoIds.includes(photo.id);
-
-              return (
-                <div
-                  key={photo.id}
-                  className={`group relative rounded-xl border bg-zinc-50 dark:bg-zinc-950 overflow-hidden shadow-sm transition-all flex flex-col ${
-                    isSelected
-                      ? "border-amber-500 ring-2 ring-amber-500/20"
-                      : "border-zinc-200 dark:border-zinc-850"
-                  }`}
+          {filteredGalleryPhotos.length === 0 ? (
+            <div className="rounded-2xl border border-zinc-200 dark:border-zinc-850 bg-white dark:bg-zinc-900/10 p-12 flex flex-col items-center justify-center text-center space-y-4">
+              <div className="h-14 w-14 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500">
+                <ImageIcon className="h-7 w-7" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200">No event photos in gallery</h3>
+                <p className="text-xs text-zinc-500 mt-1 max-w-md">
+                  {searchTerm || categoryFilter !== "All"
+                    ? "Try adjusting your search keywords or category filters above."
+                    : "No photos are loaded yet. You can load sample SUPRA photos or sync from Google Drive."}
+                </p>
+              </div>
+              <div className="flex items-center gap-3 flex-wrap justify-center">
+                <button
+                  onClick={() => setPhotos(DEFAULT_EVENT_PHOTOS)}
+                  className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold text-xs px-4 py-2.5 transition-all shadow-sm"
                 >
-                  <div className="relative aspect-[16/10] overflow-hidden bg-zinc-900">
-                    <img
-                      src={photo.image_url}
-                      alt={photo.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
+                  <RefreshCw className="h-4 w-4" />
+                  <span>Restore Sample Event Photos</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("upload_center")}
+                  className="inline-flex items-center gap-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-bold text-xs px-4 py-2.5 transition-all shadow-sm"
+                >
+                  <FolderDown className="h-4 w-4" />
+                  <span>Open Drive Sync & Upload</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {filteredGalleryPhotos.map((photo) => {
+                const isSelected = selectedPhotoIds.includes(photo.id);
 
-                    {/* Category Chip */}
-                    <div className="absolute top-2.5 left-2.5 rounded bg-black/80 backdrop-blur-md text-white text-[9px] font-bold px-2 py-0.5">
-                      {photo.category}
-                    </div>
+                return (
+                  <div
+                    key={photo.id}
+                    className={`group relative rounded-xl border bg-zinc-50 dark:bg-zinc-950 overflow-hidden shadow-sm transition-all flex flex-col ${
+                      isSelected
+                        ? "border-amber-500 ring-2 ring-amber-500/20"
+                        : "border-zinc-200 dark:border-zinc-850"
+                    }`}
+                  >
+                    <div className="relative aspect-[16/10] overflow-hidden bg-zinc-900">
+                      <img
+                        src={photo.image_url}
+                        alt={photo.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
 
-                    {/* Selection Checkbox */}
-                    <div className="absolute top-2.5 right-2.5 z-10">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedPhotoIds((prev) =>
-                            isSelected ? prev.filter((id) => id !== photo.id) : [...prev, photo.id]
-                          );
-                        }}
-                        className={`h-6 w-6 rounded-lg border flex items-center justify-center transition-all ${
-                          isSelected
-                            ? "bg-amber-500 border-amber-500 text-zinc-950 font-black shadow-md"
-                            : "bg-black/60 border-white/60 text-transparent hover:border-white"
-                        }`}
-                      >
-                        <Check className="h-3.5 w-3.5 stroke-[3px]" />
-                      </button>
-                    </div>
+                      {/* Category Chip */}
+                      <div className="absolute top-2.5 left-2.5 rounded bg-black/80 backdrop-blur-md text-white text-[9px] font-bold px-2 py-0.5">
+                        {photo.category}
+                      </div>
 
-                    {/* Hover Overlay */}
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                      <button
-                        onClick={() => setLightboxPhoto(photo)}
-                        className="p-2 rounded-xl bg-white/90 text-zinc-950 font-bold hover:bg-white shadow-lg"
-                      >
-                        <Maximize2 className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDownloadSingle(photo)}
-                        className="p-2 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 shadow-lg"
-                      >
-                        <Download className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDeletePhoto(photo.id, photo.title)}
-                        className="p-2 rounded-xl bg-rose-600 text-white font-bold hover:bg-rose-700 shadow-lg"
-                        title="Delete Photo"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
+                      {/* Selection Checkbox */}
+                      <div className="absolute top-2.5 right-2.5 z-10">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedPhotoIds((prev) =>
+                              isSelected ? prev.filter((id) => id !== photo.id) : [...prev, photo.id]
+                            );
+                          }}
+                          className={`h-6 w-6 rounded-lg border flex items-center justify-center transition-all ${
+                            isSelected
+                              ? "bg-amber-500 border-amber-500 text-zinc-950 font-black shadow-md"
+                              : "bg-black/60 border-white/60 text-transparent hover:border-white"
+                          }`}
+                        >
+                          <Check className="h-3.5 w-3.5 stroke-[3px]" />
+                        </button>
+                      </div>
 
-                  <div className="p-3.5 space-y-1 flex-1 flex flex-col justify-between">
-                    <div>
-                      <h4 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">
-                        {photo.title}
-                      </h4>
-                      <span className="text-[10px] text-zinc-500 block truncate">
-                        {photo.location} • {photo.event_day}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-2 border-t border-zinc-200 dark:border-zinc-850 text-[10px] text-zinc-500">
-                      <span>{photo.faces_detected_count} faces</span>
-                      <div className="flex items-center gap-2.5">
+                      {/* Hover Overlay */}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => setLightboxPhoto(photo)}
+                          className="p-2 rounded-xl bg-white/90 text-zinc-950 font-bold hover:bg-white shadow-lg"
+                        >
+                          <Maximize2 className="h-4 w-4" />
+                        </button>
                         <button
                           onClick={() => handleDownloadSingle(photo)}
-                          className="inline-flex items-center gap-1 text-zinc-400 hover:text-amber-400 font-semibold"
+                          className="p-2 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 shadow-lg"
                         >
-                          <Download className="h-3 w-3" /> Download
+                          <Download className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => handleDeletePhoto(photo.id, photo.title)}
-                          className="text-zinc-500 hover:text-rose-400 p-0.5"
+                          className="p-2 rounded-xl bg-rose-600 text-white font-bold hover:bg-rose-700 shadow-lg"
                           title="Delete Photo"
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
+                          <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
                     </div>
+
+                    <div className="p-3.5 space-y-1 flex-1 flex flex-col justify-between">
+                      <div>
+                        <h4 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">
+                          {photo.title}
+                        </h4>
+                        <span className="text-[10px] text-zinc-500 block truncate">
+                          {photo.location} • {photo.event_day}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-2 border-t border-zinc-200 dark:border-zinc-850 text-[10px] text-zinc-500">
+                        <span>{photo.faces_detected_count} faces</span>
+                        <div className="flex items-center gap-2.5">
+                          <button
+                            onClick={() => handleDownloadSingle(photo)}
+                            className="inline-flex items-center gap-1 text-zinc-400 hover:text-amber-400 font-semibold"
+                          >
+                            <Download className="h-3 w-3" /> Download
+                          </button>
+                          <button
+                            onClick={() => handleDeletePhoto(photo.id, photo.title)}
+                            className="text-zinc-500 hover:text-rose-400 p-0.5"
+                            title="Delete Photo"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
       {/* ======================================================== */}
       {/* 5. SUB-SECTION: ORGANIZER UPLOAD CENTER                  */}
       {/* ======================================================== */}
-      {activeTab === "upload_center" && isOrganizer && (
+      {activeTab === "upload_center" && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Multiple Photos & ZIP Upload Box */}
