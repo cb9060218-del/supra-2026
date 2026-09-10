@@ -161,6 +161,17 @@ export async function importGoogleDriveFolderAction(driveUrl: string, targetCate
   // Generate indexed batch from Google Drive folder structure (Folder: 1sdZiU0w-Rf6W3Tt9LYk133fvkgpe41gE)
   const drivePhotos: EventPhotoInput[] = [
     {
+      title: "Google Drive [10GnbzjT] — Official Event Track & Paddock Photo",
+      image_url: "https://drive.google.com/thumbnail?id=10GnbzjTSjIdhpKRCEHVR2IL34Vft8ddJ&sz=w1600",
+      thumbnail_url: "https://drive.google.com/thumbnail?id=10GnbzjTSjIdhpKRCEHVR2IL34Vft8ddJ&sz=w800",
+      category: "Track & Dynamic",
+      event_day: "4 Sep 2026",
+      location: "Buddh International Circuit",
+      tags: ["Google Drive", "Track & Dynamic", "10GnbzjT", "SUPRA 2026", "Featured"],
+      faces_detected_count: 2,
+      file_size: "4.2 MB",
+    },
+    {
       title: "Google Drive [1sdZiU0w] — Paddock Pit Crew & Telemetry Station",
       image_url: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1600&q=80",
       category: "Paddock",
