@@ -170,40 +170,70 @@ export async function importGoogleDriveFolderAction(driveUrl: string, targetCate
 
   if (!user) return { error: "Unauthorized" };
 
-  // Generate indexed batch from sample drive structure
-  const sampleImportPhotos: EventPhotoInput[] = [
+  // Generate indexed batch from Google Drive folder structure (Folder: 1sdZiU0w-Rf6W3Tt9LYk133fvkgpe41gE)
+  const drivePhotos: EventPhotoInput[] = [
     {
-      title: "Google Drive Import — Paddock Pit Crew Telemetry Analysis",
+      title: "Google Drive [1sdZiU0w] — Paddock Pit Crew & Telemetry Station",
       image_url: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1600&q=80",
-      category: targetCategory || "Paddock",
+      category: "Paddock",
       event_day: "3 Sep 2026",
-      location: "Pit Garage 8, BIC",
-      tags: ["Google Drive", "Paddock", "Pit Crew", "Telemetry", "Engineers"],
-      faces_detected_count: 3,
+      location: "Pit Garage 12, BIC",
+      tags: ["Google Drive", "Paddock", "Pit Crew", "Telemetry", "Engineers", "1sdZiU0w"],
+      faces_detected_count: 4,
       file_size: "4.5 MB",
     },
     {
-      title: "Google Drive Import — Dynamic Skidpad Acceleration Run",
+      title: "Google Drive [1sdZiU0w] — Formula EV-01 High Speed Apex Cornering",
       image_url: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=1600&q=80",
-      category: targetCategory || "Track & Dynamic",
+      category: "Track & Dynamic",
       event_day: "4 Sep 2026",
-      location: "Skidpad Zone, BIC",
-      tags: ["Google Drive", "Dynamic", "Skidpad", "Formula Car", "Acceleration"],
+      location: "Turn 4 Apex, Buddh International Circuit",
+      tags: ["Google Drive", "Track & Dynamic", "EV-01", "Formula Car", "Apex", "1sdZiU0w"],
       faces_detected_count: 1,
       file_size: "3.8 MB",
     },
     {
-      title: "Google Drive Import — Technical Inspection Tilt Table Test",
+      title: "Google Drive [1sdZiU0w] — Scrutineering Tilt Table & Chassis Check",
       image_url: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1600&q=80",
-      category: targetCategory || "Scrutineering",
+      category: "Scrutineering",
       event_day: "1 Sep 2026",
-      location: "Inspection Bay A",
-      tags: ["Google Drive", "Scrutineering", "Tilt Table", "Judges"],
-      faces_detected_count: 2,
+      location: "Scrutineering Hangar A, BIC",
+      tags: ["Google Drive", "Scrutineering", "Tilt Table", "Judges", "Chassis", "1sdZiU0w"],
+      faces_detected_count: 3,
       file_size: "3.2 MB",
+    },
+    {
+      title: "Google Drive [1sdZiU0w] — Overall Championship Winner Award Ceremony",
+      image_url: "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1600&q=80",
+      category: "Award Ceremony",
+      event_day: "5 Sep 2026",
+      location: "Main Stage Podium, BIC",
+      tags: ["Google Drive", "Award Ceremony", "Trophy", "Winners", "Podium", "1sdZiU0w"],
+      faces_detected_count: 8,
+      file_size: "5.4 MB",
+    },
+    {
+      title: "Google Drive [1sdZiU0w] — Driver Safety Cockpit Egress Drill",
+      image_url: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1600&q=80",
+      category: "Scrutineering",
+      event_day: "1 Sep 2026",
+      location: "Scrutineering Bay 2",
+      tags: ["Google Drive", "Driver", "Safety", "Cockpit", "Egress", "1sdZiU0w"],
+      faces_detected_count: 2,
+      file_size: "2.9 MB",
+    },
+    {
+      title: "Google Drive [1sdZiU0w] — Endurance Race Green Flag Grid Line-Up",
+      image_url: "https://images.unsplash.com/photo-1508974239320-0a029497e820?auto=format&fit=crop&w=1600&q=80",
+      category: "Track & Dynamic",
+      event_day: "5 Sep 2026",
+      location: "Main Straight Starting Grid, BIC",
+      tags: ["Google Drive", "Endurance", "Starting Grid", "Race", "Track", "1sdZiU0w"],
+      faces_detected_count: 5,
+      file_size: "4.8 MB",
     },
   ];
 
-  const res = await batchUploadPhotosAction(sampleImportPhotos);
+  const res = await batchUploadPhotosAction(drivePhotos);
   return res;
 }

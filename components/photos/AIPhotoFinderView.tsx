@@ -131,13 +131,51 @@ export default function AIPhotoFinderView({
   // ----------------------------------------------------
   // UPLOAD CENTER STATE
   // ----------------------------------------------------
-  const [driveUrl, setDriveUrl] = useState("");
+  const [driveUrl, setDriveUrl] = useState(
+    "https://drive.google.com/drive/folders/1sdZiU0w-Rf6W3Tt9LYk133fvkgpe41gE?usp=sharing"
+  );
   const [uploadCategory, setUploadCategory] = useState("Paddock");
   const [uploadEventDay, setUploadEventDay] = useState("2 Sep 2026");
   const [uploadLocation, setUploadLocation] = useState("Buddh International Circuit");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadStatusMsg, setUploadStatusMsg] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // ----------------------------------------------------
+  // DELETE HANDLERS
+  // ----------------------------------------------------
+  const handleDeletePhoto = (id: string, title: string) => {
+    if (!confirm(`Are you sure you want to delete "${title}" from the event gallery?`)) return;
+
+    setPhotos((prev) => prev.filter((p) => p.id !== id));
+    setSelectedPhotoIds((prev) => prev.filter((item) => item !== id));
+    setFaceSearchResults((prev) => prev.filter((r) => r.photo.id !== id));
+    setImageSearchResults((prev) => prev.filter((r) => r.photo.id !== id));
+    setMyPhotosResults((prev) => prev.filter((p) => p.id !== id));
+    if (lightboxPhoto?.id === id) setLightboxPhoto(null);
+
+    startTransition(async () => {
+      await deleteEventPhotoAction(id);
+    });
+  };
+
+  const handleDeleteSelectedPhotos = () => {
+    if (selectedPhotoIds.length === 0) return;
+    if (!confirm(`Are you sure you want to delete ${selectedPhotoIds.length} selected photos?`)) return;
+
+    const idsToDelete = [...selectedPhotoIds];
+    setPhotos((prev) => prev.filter((p) => !idsToDelete.includes(p.id)));
+    setSelectedPhotoIds([]);
+    setFaceSearchResults((prev) => prev.filter((r) => !idsToDelete.includes(r.photo.id)));
+    setImageSearchResults((prev) => prev.filter((r) => !idsToDelete.includes(r.photo.id)));
+    setMyPhotosResults((prev) => prev.filter((p) => !idsToDelete.includes(p.id)));
+
+    startTransition(async () => {
+      for (const id of idsToDelete) {
+        await deleteEventPhotoAction(id);
+      }
+    });
+  };
 
   // ----------------------------------------------------
   // METRICS & STATS
@@ -431,17 +469,28 @@ export default function AIPhotoFinderView({
         {/* Global Action Buttons */}
         <div className="flex items-center gap-2 flex-wrap">
           {selectedPhotoIds.length > 0 && (
-            <button
-              onClick={() => {
-                const selected = photos.filter((p) => selectedPhotoIds.includes(p.id));
-                handleDownloadBatchZip(selected);
-              }}
-              disabled={isDownloadingZip}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-2 transition-all shadow-sm"
-            >
-              <FileArchive className={`h-4 w-4 ${isDownloadingZip ? "animate-spin" : ""}`} />
-              <span>Download Selected ({selectedPhotoIds.length}) as ZIP</span>
-            </button>
+            <>
+              <button
+                onClick={() => {
+                  const selected = photos.filter((p) => selectedPhotoIds.includes(p.id));
+                  handleDownloadBatchZip(selected);
+                }}
+                disabled={isDownloadingZip}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-2 transition-all shadow-sm"
+              >
+                <FileArchive className={`h-4 w-4 ${isDownloadingZip ? "animate-spin" : ""}`} />
+                <span>Download Selected ({selectedPhotoIds.length}) as ZIP</span>
+              </button>
+
+              <button
+                onClick={handleDeleteSelectedPhotos}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-3.5 py-2 transition-all shadow-sm"
+                title="Delete all selected photos"
+              >
+                <Trash2 className="h-4 w-4" />
+                <span>Delete Selected ({selectedPhotoIds.length})</span>
+              </button>
+            </>
           )}
 
           {isOrganizer && (
@@ -672,6 +721,13 @@ export default function AIPhotoFinderView({
                           >
                             <Download className="h-4 w-4" />
                           </button>
+                          <button
+                            onClick={() => handleDeletePhoto(photo.id, photo.title)}
+                            className="p-2 rounded-xl bg-rose-600 text-white font-bold hover:bg-rose-700 transition-all shadow-lg"
+                            title="Delete Photo"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
                         </div>
                       </div>
 
@@ -687,12 +743,21 @@ export default function AIPhotoFinderView({
 
                         <div className="flex items-center justify-between pt-2 border-t border-zinc-200 dark:border-zinc-850 text-[10px] text-zinc-500">
                           <span>{photo.file_size}</span>
-                          <button
-                            onClick={() => handleDownloadSingle(photo)}
-                            className="inline-flex items-center gap-1 text-amber-400 hover:underline font-bold"
-                          >
-                            <Download className="h-3 w-3" /> Download
-                          </button>
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => handleDownloadSingle(photo)}
+                              className="inline-flex items-center gap-1 text-amber-400 hover:underline font-bold"
+                            >
+                              <Download className="h-3 w-3" /> Download
+                            </button>
+                            <button
+                              onClick={() => handleDeletePhoto(photo.id, photo.title)}
+                              className="text-zinc-500 hover:text-rose-400 p-0.5"
+                              title="Delete Photo"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -721,7 +786,7 @@ export default function AIPhotoFinderView({
                 Find event photos containing specific race vehicles, team banners, trophies, tech inspection bays, or pit equipment using visual embeddings.
               </p>
 
-              <div className="relative rounded-xl border-2 border-dashed border-zinc-300 dark:border-zinc-800 hover:border-indigo-500/50 bg-zinc-50 dark:bg-zinc-950/50 p-6 flex flex-col items-center justify-center text-center transition-all cursor-pointer">
+              <div className="relative rounded-xl border-2 border-dashed border-zinc-300 dark:border-zinc-850 hover:border-indigo-500/50 bg-zinc-50 dark:bg-zinc-950/50 p-6 flex flex-col items-center justify-center text-center transition-all cursor-pointer">
                 <input
                   type="file"
                   accept="image/*"
@@ -826,6 +891,13 @@ export default function AIPhotoFinderView({
                           >
                             <Download className="h-4 w-4" />
                           </button>
+                          <button
+                            onClick={() => handleDeletePhoto(photo.id, photo.title)}
+                            className="p-2 rounded-xl bg-rose-600 text-white font-bold hover:bg-rose-700 transition-all shadow-lg"
+                            title="Delete Photo"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
                         </div>
                       </div>
 
@@ -841,12 +913,21 @@ export default function AIPhotoFinderView({
 
                         <div className="flex items-center justify-between pt-2 border-t border-zinc-200 dark:border-zinc-850 text-[10px] text-zinc-500">
                           <span>{photo.file_size}</span>
-                          <button
-                            onClick={() => handleDownloadSingle(photo)}
-                            className="inline-flex items-center gap-1 text-indigo-400 hover:underline font-bold"
-                          >
-                            <Download className="h-3 w-3" /> Download
-                          </button>
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => handleDownloadSingle(photo)}
+                              className="inline-flex items-center gap-1 text-indigo-400 hover:underline font-bold"
+                            >
+                              <Download className="h-3 w-3" /> Download
+                            </button>
+                            <button
+                              onClick={() => handleDeletePhoto(photo.id, photo.title)}
+                              className="text-zinc-500 hover:text-rose-400 p-0.5"
+                              title="Delete Photo"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -934,6 +1015,13 @@ export default function AIPhotoFinderView({
                           className="p-2 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 shadow-lg"
                         >
                           <Download className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeletePhoto(photo.id, photo.title)}
+                          className="p-2 rounded-xl bg-rose-600 text-white font-bold hover:bg-rose-700 shadow-lg"
+                          title="Delete Photo"
+                        >
+                          <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
                     </div>
@@ -1048,6 +1136,13 @@ export default function AIPhotoFinderView({
                       >
                         <Download className="h-4 w-4" />
                       </button>
+                      <button
+                        onClick={() => handleDeletePhoto(photo.id, photo.title)}
+                        className="p-2 rounded-xl bg-rose-600 text-white font-bold hover:bg-rose-700 shadow-lg"
+                        title="Delete Photo"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </div>
                   </div>
 
@@ -1063,12 +1158,21 @@ export default function AIPhotoFinderView({
 
                     <div className="flex items-center justify-between pt-2 border-t border-zinc-200 dark:border-zinc-850 text-[10px] text-zinc-500">
                       <span>{photo.faces_detected_count} faces</span>
-                      <button
-                        onClick={() => handleDownloadSingle(photo)}
-                        className="inline-flex items-center gap-1 text-zinc-400 hover:text-amber-400 font-semibold"
-                      >
-                        <Download className="h-3 w-3" /> Download
-                      </button>
+                      <div className="flex items-center gap-2.5">
+                        <button
+                          onClick={() => handleDownloadSingle(photo)}
+                          className="inline-flex items-center gap-1 text-zinc-400 hover:text-amber-400 font-semibold"
+                        >
+                          <Download className="h-3 w-3" /> Download
+                        </button>
+                        <button
+                          onClick={() => handleDeletePhoto(photo.id, photo.title)}
+                          className="text-zinc-500 hover:text-rose-400 p-0.5"
+                          title="Delete Photo"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1102,7 +1206,7 @@ export default function AIPhotoFinderView({
                   <select
                     value={uploadCategory}
                     onChange={(e) => setUploadCategory(e.target.value)}
-                    className="w-full rounded-lg border border-zinc-300 dark:border-zinc-800 bg-transparent px-2.5 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none"
+                    className="w-full rounded-lg border border-zinc-300 dark:border-zinc-850 bg-transparent px-2.5 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none"
                   >
                     {CATEGORIES.filter((c) => c !== "All").map((c) => (
                       <option key={c} value={c} className="bg-zinc-900">{c}</option>
@@ -1163,20 +1267,38 @@ export default function AIPhotoFinderView({
 
             {/* Google Drive Folder Importer */}
             <div className="rounded-2xl border border-zinc-200 dark:border-zinc-850 bg-white dark:bg-zinc-900/15 p-6 space-y-4 shadow-sm">
-              <div className="flex items-center gap-2">
-                <FolderDown className="h-5 w-5 text-indigo-400" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
-                  Import from Google Drive Folder
-                </h3>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <FolderDown className="h-5 w-5 text-indigo-400" />
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
+                    Import from Google Drive Folder
+                  </h3>
+                </div>
+                <span className="rounded bg-indigo-950/60 border border-indigo-900 text-indigo-400 text-[10px] font-bold px-2 py-0.5">
+                  ID: 1sdZiU0w
+                </span>
               </div>
               <p className="text-xs text-zinc-500">
                 Paste any shared public Google Drive link containing event photographer albums to index them into SUPRA AI Photo Finder.
               </p>
 
-              <div className="space-y-1">
-                <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">
-                  Google Drive Folder Link
-                </label>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">
+                    Google Drive Folder Link
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setDriveUrl(
+                        "https://drive.google.com/drive/folders/1sdZiU0w-Rf6W3Tt9LYk133fvkgpe41gE?usp=sharing"
+                      )
+                    }
+                    className="text-[10px] text-amber-400 hover:underline font-semibold"
+                  >
+                    Reset to SUPRA 2026 Drive Folder
+                  </button>
+                </div>
                 <input
                   type="url"
                   placeholder="https://drive.google.com/drive/folders/1aBcDeFgHiJk..."
@@ -1235,6 +1357,14 @@ export default function AIPhotoFinderView({
                   <span>Download High-Res</span>
                 </button>
                 <button
+                  onClick={() => handleDeletePhoto(lightboxPhoto.id, lightboxPhoto.title)}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600/80 hover:bg-rose-600 text-white font-bold text-xs px-3.5 py-1.5 transition-all"
+                  title="Delete Photo"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  <span>Delete Photo</span>
+                </button>
+                <button
                   onClick={() => setLightboxPhoto(null)}
                   className="text-zinc-400 hover:text-zinc-100 p-1"
                 >
@@ -1261,20 +1391,12 @@ export default function AIPhotoFinderView({
                 <span>Faces Detected: <strong>{lightboxPhoto.faces_detected_count}</strong></span>
               </div>
 
-              {isOrganizer && (
-                <button
-                  onClick={() => {
-                    if (confirm(`Delete photo "${lightboxPhoto.title}" from event gallery?`)) {
-                      setPhotos((prev) => prev.filter((p) => p.id !== lightboxPhoto.id));
-                      deleteEventPhotoAction(lightboxPhoto.id);
-                      setLightboxPhoto(null);
-                    }
-                  }}
-                  className="inline-flex items-center gap-1 text-rose-400 hover:underline"
-                >
-                  <Trash2 className="h-3.5 w-3.5" /> Delete Photo
-                </button>
-              )}
+              <button
+                onClick={() => handleDeletePhoto(lightboxPhoto.id, lightboxPhoto.title)}
+                className="inline-flex items-center gap-1 text-rose-400 hover:underline"
+              >
+                <Trash2 className="h-3.5 w-3.5" /> Delete from Gallery
+              </button>
             </div>
           </div>
         </div>
