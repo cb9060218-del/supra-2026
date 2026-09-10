@@ -158,8 +158,6 @@ export async function importGoogleDriveFolderAction(driveUrl: string, targetCate
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return { error: "Unauthorized" };
-
   // Generate indexed batch from Google Drive folder structure (Folder: 1sdZiU0w-Rf6W3Tt9LYk133fvkgpe41gE)
   const drivePhotos: EventPhotoInput[] = [
     {

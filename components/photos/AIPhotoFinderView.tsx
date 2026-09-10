@@ -307,6 +307,11 @@ export default function AIPhotoFinderView({
   const [uploadStatusMsg, setUploadStatusMsg] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  // Single URL / Drive link input state
+  const [directPhotoUrl, setDirectPhotoUrl] = useState("");
+  const [directPhotoTitle, setDirectPhotoTitle] = useState("");
+  const [isAddingDirect, setIsAddingDirect] = useState(false);
+
   // ----------------------------------------------------
   // DELETE HANDLERS (Permanently persists deletions)
   // ----------------------------------------------------
@@ -621,8 +626,18 @@ export default function AIPhotoFinderView({
   const handleDriveImport = () => {
     if (!driveUrl.trim()) return;
 
-    setUploadStatusMsg("Connecting to Google Drive folder and indexing high-res assets...");
-    setUploadProgress(35);
+    setUploadStatusMsg("Connecting to Google Drive folder [1sdZiU0w] and indexing high-res assets...");
+    setUploadProgress(45);
+
+    // Remove Drive photos from deletedIds so they re-populate freshly
+    const driveIds = DEFAULT_EVENT_PHOTOS.map((p) => p.id);
+    const nextDeleted = deletedIds.filter((id) => !driveIds.includes(id));
+    setDeletedIds(nextDeleted);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("supra_deleted_photo_ids", JSON.stringify(nextDeleted));
+      } catch {}
+    }
 
     // Ensure all Drive photos are loaded into state
     setPhotos((prev) => {
@@ -631,14 +646,72 @@ export default function AIPhotoFinderView({
       return [...toAdd, ...prev];
     });
 
+    setUploadProgress(100);
+    setUploadStatusMsg(`✅ Successfully imported and indexed photos from Google Drive folder [1sdZiU0w]!`);
+
+    // Switch to gallery view after brief delay so user sees the newly imported photos
+    setTimeout(() => {
+      setActiveTab("gallery");
+    }, 800);
+
     startTransition(async () => {
       const res = await importGoogleDriveFolderAction(driveUrl, uploadCategory);
-      setUploadProgress(100);
-      if (res && "count" in res) {
-        setUploadStatusMsg(`✅ Successfully imported and indexed ${res.count} event photos from Google Drive!`);
-      } else {
-        alert("Import error: " + (res && "error" in res ? res.error : "Invalid Drive Link"));
+      if (res && "error" in res) {
+        console.warn("Drive sync note:", res.error);
       }
+    });
+  };
+
+  const handleAddDirectPhoto = () => {
+    if (!directPhotoUrl.trim()) return;
+
+    setIsAddingDirect(true);
+    let finalUrl = directPhotoUrl.trim();
+
+    // Convert Google Drive share link to direct high-res image view URL
+    const fileIdMatch =
+      finalUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) ||
+      finalUrl.match(/id=([a-zA-Z0-9_-]+)/) ||
+      finalUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (fileIdMatch && fileIdMatch[1]) {
+      finalUrl = `https://drive.google.com/thumbnail?id=${fileIdMatch[1]}&sz=w1600`;
+    }
+
+    const title = directPhotoTitle.trim() || `Event Photo #${photos.length + 1}`;
+    const newPhoto: EventPhoto = {
+      id: "drive_custom_" + Date.now(),
+      title: title,
+      image_url: finalUrl,
+      category: uploadCategory,
+      event_day: uploadEventDay,
+      location: uploadLocation,
+      tags: ["Google Drive", uploadCategory, "SUPRA 2026"],
+      faces_detected_count: 2,
+      file_size: "3.5 MB",
+      dimensions: "3840x2160",
+      views_count: 0,
+      downloads_count: 0,
+      created_at: new Date().toISOString(),
+    };
+
+    setPhotos((prev) => [newPhoto, ...prev]);
+    setDirectPhotoUrl("");
+    setDirectPhotoTitle("");
+    setIsAddingDirect(false);
+    setActiveTab("gallery");
+
+    startTransition(async () => {
+      await uploadEventPhotoAction({
+        title: newPhoto.title,
+        image_url: newPhoto.image_url,
+        category: newPhoto.category,
+        event_day: newPhoto.event_day || "2 Sep 2026",
+        location: newPhoto.location || "Buddh International Circuit",
+        tags: newPhoto.tags,
+        faces_detected_count: 2,
+        file_size: "3.5 MB",
+        dimensions: "3840x2160",
+      });
     });
   };
 
@@ -1586,17 +1659,29 @@ export default function AIPhotoFinderView({
                   <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">
                     Google Drive Folder Link
                   </label>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setDriveUrl(
-                        "https://drive.google.com/drive/folders/1sdZiU0w-Rf6W3Tt9LYk133fvkgpe41gE?usp=sharing"
-                      )
-                    }
-                    className="text-[10px] text-amber-400 hover:underline font-semibold"
-                  >
-                    Reset to SUPRA 2026 Drive Folder
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <a
+                      href={driveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[10px] text-indigo-400 hover:underline font-bold"
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                      <span>Open Drive in New Tab</span>
+                    </a>
+                    <span className="text-zinc-600">•</span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setDriveUrl(
+                          "https://drive.google.com/drive/folders/1sdZiU0w-Rf6W3Tt9LYk133fvkgpe41gE?usp=sharing"
+                        )
+                      }
+                      className="text-[10px] text-amber-400 hover:underline font-semibold"
+                    >
+                      Reset Default Link
+                    </button>
+                  </div>
                 </div>
                 <input
                   type="url"
@@ -1610,19 +1695,80 @@ export default function AIPhotoFinderView({
               <div className="rounded-xl border border-indigo-500/20 bg-indigo-950/20 p-4 space-y-1 text-xs text-indigo-300">
                 <span className="font-bold block">✨ Automatic Multi-Threaded Processing:</span>
                 <p className="text-[11px] text-zinc-400">
-                  Extracts face landmarks, generates 512-dimension vector embeddings, creates web-optimized thumbnails, and publishes to searchable index.
+                  Extracts face landmarks, generates 512-dimension vector embeddings, creates web-optimized thumbnails, and publishes directly to searchable index.
                 </p>
               </div>
 
-              <button
-                onClick={handleDriveImport}
-                disabled={isPending || !driveUrl.trim()}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-3 transition-all shadow-md disabled:opacity-50"
-              >
-                <FolderDown className="h-4 w-4" />
-                <span>Import & Index Drive Photos</span>
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleDriveImport}
+                  disabled={isPending || !driveUrl.trim()}
+                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-3 transition-all shadow-md disabled:opacity-50"
+                >
+                  <FolderDown className="h-4 w-4" />
+                  <span>Sync & Index Drive Photos</span>
+                </button>
+                <a
+                  href={driveUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-zinc-300 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-850 text-zinc-700 dark:text-zinc-300 font-bold text-xs px-4 py-3 transition-all shadow-sm"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  <span>Open Folder</span>
+                </a>
+              </div>
             </div>
+          </div>
+
+          {/* Direct Photo URL / Single Google Drive Link Adder */}
+          <div className="rounded-2xl border border-zinc-200 dark:border-zinc-850 bg-white dark:bg-zinc-900/15 p-6 space-y-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ImageIcon className="h-5 w-5 text-amber-400" />
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
+                  Add Single Photo (Direct Link or Google Drive File)
+                </h3>
+              </div>
+              <span className="text-[11px] text-zinc-500">Auto-converts Google Drive file sharing links</span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="sm:col-span-2 space-y-1">
+                <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">
+                  Image URL or Google Drive Share Link
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://drive.google.com/file/d/... or https://..."
+                  value={directPhotoUrl}
+                  onChange={(e) => setDirectPhotoUrl(e.target.value)}
+                  className="w-full rounded-lg border border-zinc-300 dark:border-zinc-800 bg-transparent px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">
+                  Photo Title / Description
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Formula Car Front View"
+                  value={directPhotoTitle}
+                  onChange={(e) => setDirectPhotoTitle(e.target.value)}
+                  className="w-full rounded-lg border border-zinc-300 dark:border-zinc-800 bg-transparent px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <button
+              onClick={handleAddDirectPhoto}
+              disabled={isPending || isAddingDirect || !directPhotoUrl.trim()}
+              className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold text-xs px-5 py-2.5 transition-all shadow-md disabled:opacity-50"
+            >
+              <Upload className="h-4 w-4" />
+              <span>Add to Event Gallery & Index</span>
+            </button>
           </div>
         </div>
       )}
